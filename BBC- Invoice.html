@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BBC Pet Clinic – Editable Invoice</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Ranchers&family=Inter:wght@400;500;700&display=swap"
+        rel="stylesheet">
+
+  <style>
+    /* ──────────────────────  Global  ────────────────────── */
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body {
+      background:#2f3542; color:#eee;
+      font-family:'Inter',sans-serif; padding:30px;
+    }
+    .invoice { max-width:900px; margin:auto; background:#1a1a2e;
+               border:1px solid #444; padding:40px; border-radius:12px;
+               box-shadow:0 10px 30px rgba(0,0,0,.3); }
+    input, textarea, select { background:#162447; color:#eee;
+                              border:1px solid #555; border-radius:6px;
+                              padding:6px 10px; width:100%; font:inherit; }
+    input:focus, textarea:focus { outline:none; border-color:#f39c12; }
+
+    /* ──────────────────────  Header  ────────────────────── */
+    .header { display:flex; justify-content:space-between; align-items:flex-start;
+              margin-bottom:30px; padding-bottom:15px; border-bottom:2px dashed #f39c12; }
+    .logo { font-family:'Ranchers',cursive; font-size:48px; background:#fff; color:#000;
+            padding:8px 16px; border-radius:12px; box-shadow:0 4px 8px rgba(0,0,0,.2); }
+    .company h1 { font-family:'Ranchers',cursive; font-size:28px; color:#f39c12; margin-bottom:8px; }
+
+    .invoice-title { text-align:right; font-family:'Ranchers',cursive;
+                     font-size:36px; color:#f39c12; margin-bottom:12px; }
+
+    /* ──────────────────────  Bill / Ship  ────────────────────── */
+    .bill-ship { display:flex; gap:20px; margin:30px 0; }
+    .bill-to, .ship-to { flex:1; background:#162447; padding:16px;
+                         border-radius:10px; border:1px solid #f39c1244; }
+    .bill-to h3, .ship-to h3 { font-family:'Ranchers',cursive; color:#f39c12;
+                               margin-bottom:12px; font-size:18px; }
+
+    /* ──────────────────────  Items Table  ────────────────────── */
+    table { width:100%; border-collapse:collapse; margin:25px 0;
+            background:#162447; border-radius:10px; overflow:hidden; }
+    th { background:#1a2a6c; color:#f1f3f5; padding:14px; text-align:left; }
+    td { padding:12px 14px; border-bottom:1px solid #333; color:#ddd; }
+    .text-right { text-align:right; }
+    .empty-row td { height:40px; background:#1e2a47; }
+
+    .line-item input { margin-top:4px; }
+    .remove-line { background:#e74c3c; color:#fff; border:none;
+                   padding:4px 8px; border-radius:4px; cursor:pointer; }
+
+    /* ──────────────────────  Totals  ────────────────────── */
+    .totals { float:right; width:42%; background:#162447; padding:16px;
+              border-radius:10px; border:1px solid #f39c1244; margin-top:20px; }
+    .totals td { padding:7px 0; border:none; color:#eee; }
+    .totals .label { font-weight:500; color:#ccc; }
+    .totals .amount { text-align:right; color:#f39c12; font-weight:600; }
+    .total-row { border-top:2px solid #f39c12; font-family:'Ranchers',cursive;
+                 font-size:18px; color:#f1f3f5; }
+    .total-row .amount { color:#fff; }
+
+    .balance-due { clear:both; background:linear-gradient(135deg,#f39c12,#e67e22);
+                   color:#000; text-align:center; padding:16px;
+                   font-family:'Ranchers',cursive; font-size:22px; font-weight:bold;
+                   border-radius:12px; margin:30px 0;
+                   box-shadow:0 4px 12px rgba(243,156,18,.3); }
+
+    /* ──────────────────────  Remarks  ────────────────────── */
+    .remarks { background:#162447; padding:16px; border-radius:10px;
+               border-left:4px solid #f39c12; margin-top:40px; }
+    .remarks h4 { font-family:'Ranchers',cursive; color:#f39c12;
+                  margin-bottom:10px; font-size:18px; }
+
+    /* ──────────────────────  Buttons  ────────────────────── */
+    .btn { background:#f39c12; color:#000; border:none; padding:10px 20px;
+           border-radius:8px; font-weight:bold; cursor:pointer;
+           margin-top:20px; font-family:'Inter',sans-serif; }
+    .btn:hover { background:#e67e22; }
+
+    @media print {
+      body { background:#fff; color:#000; }
+      .invoice { border:none; box-shadow:none; background:#fff; }
+      .totals, .bill-to, .ship-to, .remarks, table { background:#f9f9f9 !important; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="invoice" id="invoice">
+
+  <!-- ==================== HEADER ==================== -->
+  <div class="header">
+    <div class="logo" contenteditable="true" id="logoText">BBC</div>
+    <div class="company">
+      <h1 contenteditable="true" id="clinicName">BBC Pet Clinic</h1>
+      <div contenteditable="true" id="clinicAddr"><span class="placeholder">&lt;Address&gt;</span><br>
+        <span class="placeholder">&lt;City, State, ZIP&gt;</span><br>
+        <span class="placeholder">&lt;Phone&gt;</span><br>
+        <span class="placeholder">&lt;Email&gt;</span></div>
+    </div>
+  </div>
+
+  <div class="invoice-title">INVOICE</div>
+
+  <div style="text-align:right; margin-bottom:20px;">
+    <strong>DATE</strong> <input type="date" id="invDate" style="width:auto;display:inline-block;"><br>
+    <strong>INVOICE NO.</strong> <input type="text" id="invNo" placeholder="e.g. 00123"><br>
+    <div class="payment-terms" contenteditable="true" id="payTerms">
+      &lt;Payment terms (due on receipt, due in X days)&gt;
+    </div>
+  </div>
+
+  <!-- ==================== BILL / SHIP ==================== -->
+  <div class="bill-ship">
+    <div class="bill-to">
+      <h3>BILL TO</h3>
+      <div contenteditable="true" id="billContact">&lt;Contact Name&gt;</div>
+      <div contenteditable="true" id="billCompany">&lt;Client Company Name&gt;</div>
+      <div contenteditable="true" id="billAddr">&lt;Address&gt;</div>
+      <div contenteditable="true" id="billPhone">&lt;Phone&gt;</div>
+      <div contenteditable="true" id="billEmail">&lt;Email&gt;</div>
+    </div>
+    <div class="ship-to">
+      <h3>SHIP TO</h3>
+      <div contenteditable="true" id="shipName">&lt;Name / Dept&gt;</div>
+      <div contenteditable="true" id="shipCompany">&lt;Client Company Name&gt;</div>
+      <div contenteditable="true" id="shipAddr">&lt;Address&gt;</div>
+      <div contenteditable="true" id="shipPhone">&lt;Phone&gt;</div>
+    </div>
+  </div>
+
+  <!-- ==================== LINE ITEMS ==================== -->
+  <table id="itemsTable">
+    <thead>
+      <tr>
+        <th>DESCRIPTION</th>
+        <th class="text-right">QTY</th>
+        <th class="text-right">UNIT PRICE</th>
+        <th class="text-right">TOTAL</th>
+        <th style="width:40px;"></th>
+      </tr>
+    </thead>
+    <tbody id="itemsBody">
+      <!-- rows added by JS -->
+    </tbody>
+  </table>
+
+  <button class="btn" id="addRow">+ Add Line Item</button>
+
+  <!-- ==================== TOTALS ==================== -->
+  <div class="totals">
+    <table>
+      <tr><td class="label">SUBTOTAL</td><td class="amount" id="subtotal">0.00</td></tr>
+      <tr><td class="label">DISCOUNT</td><td class="amount"><input type="number" id="discount" min="0" step="0.01" value="0"></td></tr>
+      <tr><td class="label">SUBTOTAL LESS DISCOUNT</td><td class="amount" id="afterDiscount">0.00</td></tr>
+      <tr><td class="label">TAX RATE (%)</td><td class="amount"><input type="number" id="taxRate" min="0" step="0.01" value="0"></td></tr>
+      <tr><td class="label">TOTAL TAX</td><td class="amount" id="taxAmt">0.00</td></tr>
+      <tr><td class="label">SHIPPING/HANDLING</td><td class="amount"><input type="number" id="shipping" min="0" step="0.01" value="0"></td></tr>
+      <tr class="total-row"><td class="label">Balance Due</td><td class="amount" id="balanceDue">₱ 0.00</td></tr>
+    </table>
+  </div>
+  <div style="clear:both;"></div>
+
+  <div class="balance-due" id="balanceHighlight">₱ 0.00</div>
+
+  <!-- ==================== REMARKS ==================== -->
+  <div class="remarks">
+    <h4>Remarks / Payment Instructions:</h4>
+    <textarea id="remarks" rows="3" placeholder="Add any notes or payment instructions here"></textarea>
+  </div>
+
+  <button class="btn" id="saveInvoice">Save Invoice</button>
+  <button class="btn" id="printInvoice" style="margin-left:10px;">Print / PDF</button>
+
+</div>
+
+<script>
+/* ──────────────────────  Helpers  ────────────────────── */
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+function fmt(num){ return Number(num).toFixed(2); }
+
+function calcLine(row){
+  const qty = parseFloat(row.querySelector('.qty').value) || 0;
+  const price = parseFloat(row.querySelector('.price').value) || 0;
+  const total = qty * price;
+  row.querySelector('.lineTotal').textContent = fmt(total);
+  return total;
+}
+
+function recalcAll(){
+  let sub = 0;
+  $$('#itemsBody tr').forEach(r => sub += calcLine(r));
+
+  const disc = parseFloat($('#discount').value) || 0;
+  const after = sub - disc;
+  const taxRate = parseFloat($('#taxRate').value) || 0;
+  const tax = after * (taxRate/100);
+  const ship = parseFloat($('#shipping').value) || 0;
+  const bal = after + tax + ship;
+
+  $('#subtotal').textContent = fmt(sub);
+  $('#afterDiscount').textContent = fmt(after);
+  $('#taxAmt').textContent = fmt(tax);
+  $('#balanceDue').textContent = '₱ ' + fmt(bal);
+  $('#balanceHighlight').textContent = '₱ ' + fmt(bal);
+}
+
+/* ──────────────────────  Add / Remove rows  ────────────────────── */
+function addRow(data = {}){
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td><input type="text" class="desc" placeholder="Description" value="${data.desc||''}"></td>
+    <td class="text-right"><input type="number" class="qty" min="0" step="0.01" value="${data.qty||''}"></td>
+    <td class="text-right"><input type="number" class="price" min="0" step="0.01" value="${data.price||''}"></td>
+    <td class="text-right lineTotal">0.00</td>
+    <td><button class="remove-line">X</button></td>
+  `;
+  $('#itemsBody').appendChild(tr);
+
+  // event listeners for this row
+  tr.querySelectorAll('input').forEach(inp => inp.addEventListener('input',()=>recalcAll()));
+  tr.querySelector('.remove-line').addEventListener('click',()=> { tr.remove(); recalcAll(); });
+  recalcAll();
+}
+$('#addRow').addEventListener('click',()=>addRow());
+
+/* ──────────────────────  Save / Load  ────────────────────── */
+function collectData(){
+  const items = [];
+  $$('#itemsBody tr').forEach(r=>{
+    items.push({
+      desc: r.querySelector('.desc').value,
+      qty: r.querySelector('.qty').value,
+      price: r.querySelector('.price').value
+    });
+  });
+  return {
+    logo: $('#logoText').innerText,
+    clinicName: $('#clinicName').innerText,
+    clinicAddr: $('#clinicAddr').innerHTML,
+    invDate: $('#invDate').value,
+    invNo: $('#invNo').value,
+    payTerms: $('#payTerms').innerHTML,
+    billContact: $('#billContact').innerHTML,
+    billCompany: $('#billCompany').innerHTML,
+    billAddr: $('#billAddr').innerHTML,
+    billPhone: $('#billPhone').innerHTML,
+    billEmail: $('#billEmail').innerHTML,
+    shipName: $('#shipName').innerHTML,
+    shipCompany: $('#shipCompany').innerHTML,
+    shipAddr: $('#shipAddr').innerHTML,
+    shipPhone: $('#shipPhone').innerHTML,
+    discount: $('#discount').value,
+    taxRate: $('#taxRate').value,
+    shipping: $('#shipping').value,
+    remarks: $('#remarks').value,
+    items
+  };
+}
+function populate(data){
+  $('#logoText').innerText = data.logo||'BBC';
+  $('#clinicName').innerText = data.clinicName||'BBC Pet Clinic';
+  $('#clinicAddr').innerHTML = data.clinicAddr||'&lt;Address&gt;<br>&lt;City, State, ZIP&gt;<br>&lt;Phone&gt;<br>&lt;Email&gt;';
+  $('#invDate').value = data.invDate||'';
+  $('#invNo').value = data.invNo||'';
+  $('#payTerms').innerHTML = data.payTerms||'&lt;Payment terms (due on receipt, due in X days)&gt;';
+  $('#billContact').innerHTML = data.billContact||'&lt;Contact Name&gt;';
+  $('#billCompany').innerHTML = data.billCompany||'&lt;Client Company Name&gt;';
+  $('#billAddr').innerHTML = data.billAddr||'&lt;Address&gt;';
+  $('#billPhone').innerHTML = data.billPhone||'&lt;Phone&gt;';
+  $('#billEmail').innerHTML = data.billEmail||'&lt;Email&gt;';
+  $('#shipName').innerHTML = data.shipName||'&lt;Name / Dept&gt;';
+  $('#shipCompany').innerHTML = data.shipCompany||'&lt;Client Company Name&gt;';
+  $('#shipAddr').innerHTML = data.shipAddr||'&lt;Address&gt;';
+  $('#shipPhone').innerHTML = data.shipPhone||'&lt;Phone&gt;';
+  $('#discount').value = data.discount||'0';
+  $('#taxRate').value = data.taxRate||'0';
+  $('#shipping').value = data.shipping||'0';
+  $('#remarks').value = data.remarks||'';
+
+  // clear existing rows
+  $('#itemsBody').innerHTML = '';
+  (data.items||[]).forEach(it=>addRow(it));
+  recalcAll();
+}
+
+/* ──────────────────────  Buttons  ────────────────────── */
+$('#saveInvoice').addEventListener('click',()=>{
+  const data = collectData();
+  localStorage.setItem('bbcInvoice', JSON.stringify(data));
+  alert('Invoice saved! (stored in your browser)');
+});
+$('#printInvoice').addEventListener('click',()=>window.print());
+
+/* ──────────────────────  Auto‑calc on any change  ────────────────────── */
+$('#discount,#taxRate,#shipping').addEventListener('input',recalcAll);
+
+/* ──────────────────────  Load on start  ────────────────────── */
+if(localStorage.getItem('bbcInvoice')){
+  try{ populate(JSON.parse(localStorage.getItem('bbcInvoice'))); }
+  catch(e){ console.warn('Could not load saved invoice',e); }
+} else {
+  // start with one empty row
+  addRow();
+}
+
+/* ──────────────────────  Contenteditable placeholders  ────────────────────── */
+document.addEventListener('focus',e=>{
+  if(e.target.matches('[contenteditable]') && e.target.innerHTML.includes('&lt;')){
+    e.target.innerHTML = '';
+  }
+},true);
+</script>
+
+</body>
+</html>
