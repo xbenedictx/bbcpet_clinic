@@ -69,6 +69,7 @@ function updateNavigation() {
 // Show/Hide page functions
 function showPage(pageId) {
     // Hide all pages
+    cleanupModals();
     const pages = document.querySelectorAll(".page-content");
     pages.forEach((page) => (page.style.display = "none"));
 
@@ -466,6 +467,18 @@ function capitalizeFirst(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
+function cleanupModals() {
+    document.querySelectorAll(".modal").forEach((modal) => {
+        const bsModal = bootstrap.Modal.getInstance(modal);
+        if (bsModal) bsModal.dispose();
+        modal.remove();
+    });
+    document.querySelectorAll(".modal-backdrop").forEach((b) => b.remove());
+    document.body.classList.remove("modal-open");
+    document.body.style.overflow = "";
+    document.body.style.paddingRight = "";
+}
+
 // Export functions for use in other modules
 window.AppState = AppState;
 window.showPage = showPage;
@@ -485,3 +498,24 @@ window.formatDate = formatDate;
 window.formatTime = formatTime;
 window.generateId = generateId;
 window.capitalizeFirst = capitalizeFirst;
+// modal cleanup (call every time you change page or close a modal)
+window.cleanupModals = function () {
+    // 1. Dispose any live Bootstrap modal instances
+    document.querySelectorAll(".modal").forEach((m) => {
+        const instance = bootstrap.Modal.getInstance(m);
+        if (instance) instance.dispose();
+    });
+
+    // 2. Remove every modal element (including the one you just created)
+    document.querySelectorAll(".modal").forEach((m) => m.remove());
+
+    // 3. Remove every leftover backdrop
+    document.querySelectorAll(".modal-backdrop").forEach((b) => b.remove());
+
+    // 4. Reset body classes / inline styles that Bootstrap adds
+    document.body.classList.remove("modal-open");
+    document.body.style.overflow = "";
+    document.body.style.paddingRight = "";
+    document.documentElement.style.overflow = "";
+    document.documentElement.style.paddingRight = "";
+};

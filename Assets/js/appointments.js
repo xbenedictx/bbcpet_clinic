@@ -851,11 +851,198 @@ function viewAppointmentDetails(appointmentId) {
     modal.show();
 }
 
-// Edit appointment
 function editAppointment(appointmentId) {
-    // Implementation for editing appointments
-    showAlert("Edit appointment functionality will be implemented", "info");
+    let appointment;
+    if (AppState.userType === "admin") {
+        appointment = getAllAppointments().find(
+            (apt) => apt.id === appointmentId
+        );
+    } else {
+        appointment = AppState.appointments.find(
+            (apt) => apt.id === appointmentId
+        );
+    }
+
+    if (!appointment) {
+        showAlert("Appointment not found", "danger");
+        return;
+    }
+
+    // Close any existing modals first
+    const existingDetailsModal = document.getElementById(
+        "appointmentDetailsModal"
+    );
+    if (existingDetailsModal) {
+        const modalInstance = bootstrap.Modal.getInstance(existingDetailsModal);
+        if (modalInstance) {
+            modalInstance.hide();
+        }
+    }
+
+    // Create edit modal HTML
+    const modalHtml = `
+        <div class="modal fade" id="editAppointmentModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Appointment for ${
+                            appointment.petName
+                        }</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="edit-appointment-form">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Date</label>
+                                    <input type="date" class="form-control" id="edit-date" value="${
+                                        appointment.date
+                                    }" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Time</label>
+                                    <input type="time" class="form-control" id="edit-time" value="${
+                                        appointment.time
+                                    }" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Veterinarian</label>
+                                <select class="form-select" id="edit-veterinarian" required>
+                                    <option value="Dr. Sarah Johnson" ${
+                                        appointment.veterinarian ===
+                                        "Dr. Sarah Johnson"
+                                            ? "selected"
+                                            : ""
+                                    }>Dr. Sarah Johnson</option>
+                                    <option value="Dr. Michael Lee" ${
+                                        appointment.veterinarian ===
+                                        "Dr. Michael Lee"
+                                            ? "selected"
+                                            : ""
+                                    }>Dr. Michael Lee</option>
+                                    <option value="Dr. Emily Chen" ${
+                                        appointment.veterinarian ===
+                                        "Dr. Emily Chen"
+                                            ? "selected"
+                                            : ""
+                                    }>Dr. Emily Chen</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Reason</label>
+                                <input type="text" class="form-control" id="edit-reason" value="${
+                                    appointment.reason
+                                }" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Notes</label>
+                                <textarea class="form-control" id="edit-notes">${
+                                    appointment.notes || ""
+                                }</textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="handleEditAppointment('${
+                            appointment.id
+                        }')">
+                            <i class="fas fa-save me-2"></i>Save Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Remove existing edit modal if any
+    const existingEditModal = document.getElementById("editAppointmentModal");
+    if (existingEditModal) {
+        existingEditModal.remove();
+    }
+
+    // Add modal to page
+    document.getElementById("modal-container").innerHTML += modalHtml;
+
+    const modal = new bootstrap.Modal(
+        document.getElementById("editAppointmentModal")
+    );
+    modal.show();
 }
+// Handle edit appointment submission
+function handleEditAppointment(appointmentId) {
+    const date = document.getElementById("edit-date").value;
+    const time = document.getElementById("edit-time").value;
+    const veterinarian = document.getElementById("edit-veterinarian").value;
+    const reason = document.getElementById("edit-reason").value;
+    const notes = document.getElementById("edit-notes").value.trim();
+
+    if (AppState.userType === "admin") {
+        // Update for admin
+        const allAppointments = getAllAppointments();
+        const appointment = allAppointments.find(
+            (apt) => apt.id === appointmentId
+        );
+
+        if (appointment) {
+            const ownerAppointments = JSON.parse(
+                localStorage.getItem(
+                    `bbc_clinic_appointments_${appointment.ownerId}`
+                ) || "[]"
+            );
+            const appointmentIndex = ownerAppointments.findIndex(
+                (apt) => apt.id === appointmentId
+            );
+
+            if (appointmentIndex !== -1) {
+                ownerAppointments[appointmentIndex] = {
+                    ...ownerAppointments[appointmentIndex],
+                    date,
+                    time,
+                    veterinarian,
+                    reason,
+                    notes,
+                };
+                localStorage.setItem(
+                    `bbc_clinic_appointments_${appointment.ownerId}`,
+                    JSON.stringify(ownerAppointments)
+                );
+            }
+        }
+    } else {
+        // Update for regular user
+        const appointmentIndex = AppState.appointments.findIndex(
+            (apt) => apt.id === appointmentId
+        );
+        if (appointmentIndex !== -1) {
+            AppState.appointments[appointmentIndex] = {
+                ...AppState.appointments[appointmentIndex],
+                date,
+                time,
+                veterinarian,
+                reason,
+                notes,
+            };
+            saveUserData();
+        }
+    }
+
+    // Close modal
+    const modal = bootstrap.Modal.getInstance(
+        document.getElementById("editAppointmentModal")
+    );
+    if (modal) {
+        modal.hide();
+    }
+
+    // Refresh page
+    renderAppointmentsPage();
+    showAlert("Appointment updated successfully!", "success");
+}
+
+// Export the function
+window.handleEditAppointment = handleEditAppointment;
 
 // Show new appointment modal (admin)
 function showNewAppointmentModal() {
