@@ -38,7 +38,7 @@ function renderAdminBillingPage(container) {
             <div class="col-md-3 mb-3">
                 <div class="stat-card success">
                     <div class="stat-icon success">
-                        <i class="fas fa-dollar-sign"></i>
+                        <i class="fas fa-money-bill-alt"></i>
                     </div>
                     <h3 class="fw-bold mb-1" id="total-revenue">₱0</h3>
                     <p class="text-muted mb-0">Total Revenue</p>
@@ -158,7 +158,7 @@ function renderUserBillingPage(container) {
             <div class="col-md-4 mb-3">
                 <div class="stat-card info">
                     <div class="stat-icon info">
-                        <i class="fas fa-dollar-sign"></i>
+                        <i class="fas fa-money-bill-alt"></i>
                     </div>
                     <h3 class="fw-bold mb-1" id="user-total-spent">₱0</h3>
                     <p class="text-muted mb-0">Total Spent</p>
@@ -539,6 +539,62 @@ function calculateInvoiceTotal() {
         2
     )}`;
 }
+// Save invoices to localStorage
+function saveInvoices() {
+    if (!AppState.currentUser) return;
+
+    // Save to the current user's invoice storage
+    localStorage.setItem(
+        `bbc_clinic_invoices_${AppState.currentUser.id}`,
+        JSON.stringify(AppState.invoices)
+    );
+}
+
+function getAllClients() {
+    const clients = [];
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (
+            key &&
+            key.startsWith("bbc_clinic_user_") &&
+            key !== "bbc_clinic_user"
+        ) {
+            const user = JSON.parse(localStorage.getItem(key));
+            if (user.type !== "admin") {
+                clients.push({
+                    id: user.id,
+                    name: `${user.firstName} ${user.lastName}`,
+                    email: user.email,
+                    phone: user.phone,
+                });
+            }
+        }
+    }
+    // Also check the main admin account storage
+    const adminData = localStorage.getItem("bbc_clinic_admin");
+    if (adminData) {
+        // Admin might have a clients list
+    }
+    return clients;
+}
+// Get all invoices from localStorage
+function getAllInvoices() {
+    if (AppState.userType === "admin") {
+        // Admin: collect invoices from all users
+        const allInvoices = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith("bbc_clinic_invoices_")) {
+                const invoices = JSON.parse(localStorage.getItem(key));
+                allInvoices.push(...invoices);
+            }
+        }
+        return allInvoices;
+    } else {
+        // Regular user: return only their invoices
+        return AppState.invoices;
+    }
+}
 
 // Handle create invoice form submission
 function handleCreateInvoice(event) {
@@ -603,5 +659,101 @@ function handleCreateInvoice(event) {
         clientName: client.name,
         petId: petId,
         petName: pet.name,
+        date: date,
+        paymentMethod: paymentMethod,
+        services: services,
+        subtotal: subtotal,
+        tax: 0,
+        total: total,
+        status: "pending",
     };
+    // Save the invoice
+    AppState.invoices.push(invoiceData);
+    saveInvoices();
+
+    // Close modal and show success
+    const modal = bootstrap.Modal.getInstance(
+        document.getElementById("createInvoiceModal")
+    );
+    modal.hide();
+
+    // Refresh the page and show confirmation
+    renderBillingPage();
+    showAlert("Invoice created successfully!", "success");
 }
+
+// ========================
+// Update Billing Statistics
+// ========================
+function updateBillingStats() {
+    const allInvoices = getAllInvoices();
+
+    let totalRevenue = 0;
+    let pendingInvoices = 0;
+    let monthlyRevenue = 0;
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    allInvoices.forEach((invoice) => {
+        const invDate = new Date(invoice.date);
+        const isThisMonth =
+            invDate.getMonth() === currentMonth &&
+            invDate.getFullYear() === currentYear;
+
+        const amount = invoice.total || 0;
+
+        if (invoice.status === "paid") {
+            totalRevenue += amount;
+            if (isThisMonth) monthlyRevenue += amount;
+        } else if (invoice.status === "pending") {
+            pendingInvoices++;
+        }
+    });
+
+    // Update UI elements if they exist
+    const totalRevenueElem = document.getElementById("total-revenue");
+    const pendingElem = document.getElementById("pending-invoices");
+    const monthlyElem = document.getElementById("monthly-revenue");
+    const totalInvoicesElem = document.getElementById("total-invoices");
+
+    if (totalRevenueElem)
+        totalRevenueElem.textContent = `₱${totalRevenue.toFixed(2)}`;
+    if (pendingElem) pendingElem.textContent = pendingInvoices;
+    if (monthlyElem) monthlyElem.textContent = `₱${monthlyRevenue.toFixed(2)}`;
+    if (totalInvoicesElem) totalInvoicesElem.textContent = allInvoices.length;
+}
+
+// Mark invoice as paid (admin only)
+function markInvoicePaid(invoiceId) {
+    if (AppState.userType !== "admin") {
+        showAlert("Access denied", "danger");
+        return;
+    }
+
+    // Find the invoice across all users
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && key.startsWith("bbc_clinic_invoices_")) {
+            const invoices = JSON.parse(localStorage.getItem(key));
+            const invoice = invoices.find((inv) => inv.id === invoiceId);
+
+            if (invoice) {
+                // Update the invoice status
+                invoice.status = "paid";
+
+                // Save back to localStorage
+                localStorage.setItem(key, JSON.stringify(invoices));
+
+                // Refresh the billing page
+                renderBillingPage();
+                showAlert("Invoice marked as paid successfully!", "success");
+                return;
+            }
+        }
+    }
+
+    showAlert("Invoice not found", "danger");
+}
+
+window.markInvoicePaid = markInvoicePaid;

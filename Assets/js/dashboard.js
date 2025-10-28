@@ -56,7 +56,7 @@ function renderAdminDashboard(container) {
             <div class="col-md-3 mb-3">
                 <div class="stat-card info">
                     <div class="stat-icon info">
-                        <i class="fas fa-dollar-sign"></i>
+                        <i class="fas fa-money-bill-alt"></i>
                     </div>
                     <h3 class="fw-bold mb-1" id="monthly-revenue">₱0</h3>
                     <p class="text-muted mb-0">Monthly Revenue</p>
