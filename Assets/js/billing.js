@@ -413,10 +413,6 @@ function showCreateInvoiceModal() {
                                                 <span>Subtotal:</span>
                                                 <span id="invoice-subtotal">₱0.00</span>
                                             </div>
-                                            <div class="d-flex justify-content-between mb-2">
-                                                <span>Tax (8%):</span>
-                                                <span id="invoice-tax">₱0.00</span>
-                                            </div>
                                             <hr>
                                             <div class="d-flex justify-content-between h5">
                                                 <span>Total:</span>
