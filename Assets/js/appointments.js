@@ -1064,10 +1064,20 @@ function showDayAppointments(date) {
     showAlert(`Show appointments for ${date}`, "info");
 }
 
-// Filter appointments
 function filterAppointments() {
-    // Implementation for filtering appointments
-    showAlert("Filter appointments functionality will be implemented", "info");
+    const status = document.getElementById("status-filter").value;
+    const dateFrom = document.getElementById("date-from").value;
+    const dateTo = document.getElementById("date-to").value;
+
+    let appointments = getAllAppointments(); // Or AppState.appointments for user
+    if (status)
+        appointments = appointments.filter((apt) => apt.status === status);
+    if (dateFrom)
+        appointments = appointments.filter((apt) => apt.date >= dateFrom);
+    if (dateTo) appointments = appointments.filter((apt) => apt.date <= dateTo);
+
+    document.getElementById("appointments-list").innerHTML =
+        renderAppointmentsList(appointments);
 }
 
 // Clear filters
