@@ -320,7 +320,11 @@ function renderAppointmentsList(appointments) {
         )
         .map(
             (appointment) => `
-            <div class="appointment-card ${appointment.status} mb-3">
+            <div 
+                class="appointment-card ${appointment.status} mb-3" 
+                onclick="viewAppointmentDetails('${appointment.id}')" 
+                style="cursor: pointer;"
+            >
                 <div class="d-flex justify-content-between align-items-start">
                     <div class="flex-grow-1">
                         <div class="d-flex align-items-center mb-2">
@@ -380,8 +384,7 @@ function renderAppointmentsList(appointments) {
                         }
                     </div>
                     
-                    <div class="dropdown">
-                        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                    <div class="dropdown" onclick="event.stopPropagation();"> <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
                             <i class="fas fa-ellipsis-v"></i>
                         </button>
                         <ul class="dropdown-menu">
@@ -768,11 +771,84 @@ function cancelAppointment(appointmentId) {
 
 // View appointment details
 function viewAppointmentDetails(appointmentId) {
-    // Implementation for viewing appointment details
-    showAlert(
-        "View appointment details functionality will be implemented",
-        "info"
+    let appointment;
+    if (AppState.userType === "admin") {
+        appointment = getAllAppointments().find(
+            (apt) => apt.id === appointmentId
+        );
+    } else {
+        appointment = AppState.appointments.find(
+            (apt) => apt.id === appointmentId
+        );
+    }
+
+    if (!appointment) {
+        showAlert("Appointment not found", "danger");
+        return;
+    }
+
+    const modalHtml = `
+        <div class="modal fade" id="appointmentDetailsModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Appointment for ${
+                            appointment.petName
+                        } - ${formatDate(appointment.date)}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Date:</strong> ${formatDate(
+                                    appointment.date
+                                )}</p>
+                                <p><strong>Time:</strong> ${formatTime(
+                                    appointment.time
+                                )}</p>
+                                <p><strong>Status:</strong> <span class="status-badge status-${
+                                    appointment.status
+                                }">${capitalizeFirst(
+        appointment.status
+    )}</span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Veterinarian:</strong> ${
+                                    appointment.veterinarian
+                                }</p>
+                                <p><strong>Reason:</strong> ${
+                                    appointment.reason
+                                }</p>
+                                <p><strong>Notes:</strong> ${
+                                    appointment.notes || "None"
+                                }</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary" onclick="editAppointment('${
+                            appointment.id
+                        }')">
+                            <i class="fas fa-edit me-2"></i>Edit
+                        </button>
+                        <button type="button" class="btn btn-danger" onclick="cancelAppointment('${
+                            appointment.id
+                        }')">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Add to modal-container (similar to pets.js)
+    document.getElementById("modal-container").innerHTML = modalHtml;
+    const modal = new bootstrap.Modal(
+        document.getElementById("appointmentDetailsModal")
     );
+    modal.show();
 }
 
 // Edit appointment
