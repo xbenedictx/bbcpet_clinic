@@ -58,7 +58,7 @@ function renderAdminDashboard(container) {
                     <div class="stat-icon info">
                         <i class="fas fa-dollar-sign"></i>
                     </div>
-                    <h3 class="fw-bold mb-1" id="monthly-revenue">$0</h3>
+                    <h3 class="fw-bold mb-1" id="monthly-revenue">₱0</h3>
                     <p class="text-muted mb-0">Monthly Revenue</p>
                 </div>
             </div>
@@ -308,7 +308,7 @@ function loadAdminDashboardData() {
     );
     document.getElementById(
         "monthly-revenue"
-    ).textContent = `$${monthlyRevenue.toFixed(2)}`;
+    ).textContent = `₱${monthlyRevenue.toFixed(2)}`;
 
     // Load recent appointments
     loadRecentAppointments();

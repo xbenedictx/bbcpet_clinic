@@ -40,7 +40,7 @@ function renderAdminBillingPage(container) {
                     <div class="stat-icon success">
                         <i class="fas fa-dollar-sign"></i>
                     </div>
-                    <h3 class="fw-bold mb-1" id="total-revenue">$0</h3>
+                    <h3 class="fw-bold mb-1" id="total-revenue">₱0</h3>
                     <p class="text-muted mb-0">Total Revenue</p>
                 </div>
             </div>
@@ -58,7 +58,7 @@ function renderAdminBillingPage(container) {
                     <div class="stat-icon info">
                         <i class="fas fa-calendar-month"></i>
                     </div>
-                    <h3 class="fw-bold mb-1" id="monthly-revenue">$0</h3>
+                    <h3 class="fw-bold mb-1" id="monthly-revenue">₱0</h3>
                     <p class="text-muted mb-0">This Month</p>
                 </div>
             </div>
@@ -160,7 +160,7 @@ function renderUserBillingPage(container) {
                     <div class="stat-icon info">
                         <i class="fas fa-dollar-sign"></i>
                     </div>
-                    <h3 class="fw-bold mb-1" id="user-total-spent">$0</h3>
+                    <h3 class="fw-bold mb-1" id="user-total-spent">₱0</h3>
                     <p class="text-muted mb-0">Total Spent</p>
                 </div>
             </div>
@@ -217,7 +217,7 @@ function renderInvoicesList(invoices) {
                             }</p>
                         </div>
                         <div class="text-end">
-                            <div class="h4 fw-bold text-success mb-1">$${invoice.total.toFixed(
+                            <div class="h4 fw-bold text-success mb-1">₱${invoice.total.toFixed(
                                 2
                             )}</div>
                             <span class="status-badge status-${invoice.status}">
@@ -239,10 +239,10 @@ function renderInvoicesList(invoices) {
                         </p>
                     </div>
                     <div class="col-md-6">
-                        <p class="text-muted mb-1 small">Subtotal: $${invoice.subtotal.toFixed(
+                        <p class="text-muted mb-1 small">Subtotal: ₱${invoice.subtotal.toFixed(
                             2
                         )}</p>
-                        <p class="text-muted mb-1 small">Tax: $${invoice.tax.toFixed(
+                        <p class="text-muted mb-1 small">Tax: ₱${invoice.tax.toFixed(
                             2
                         )}</p>
                     </div>
@@ -268,8 +268,8 @@ function renderInvoicesList(invoices) {
                                     <tr>
                                         <td>${service.description}</td>
                                         <td>${service.quantity}</td>
-                                        <td>$${service.price.toFixed(2)}</td>
-                                        <td>$${(
+                                        <td>₱${service.price.toFixed(2)}</td>
+                                        <td>₱${(
                                             service.quantity * service.price
                                         ).toFixed(2)}</td>
                                     </tr>
@@ -393,7 +393,7 @@ function showCreateInvoiceModal() {
                                                 </div>
                                                 <div class="col-md-2">
                                                     <div class="input-group">
-                                                        <span class="input-group-text">$</span>
+                                                        <span class="input-group-text">₱</span>
                                                         <input type="number" class="form-control service-total" placeholder="0.00" readonly>
                                                     </div>
                                                 </div>
@@ -411,16 +411,16 @@ function showCreateInvoiceModal() {
                                         <div class="col-md-4">
                                             <div class="d-flex justify-content-between mb-2">
                                                 <span>Subtotal:</span>
-                                                <span id="invoice-subtotal">$0.00</span>
+                                                <span id="invoice-subtotal">₱0.00</span>
                                             </div>
                                             <div class="d-flex justify-content-between mb-2">
                                                 <span>Tax (8%):</span>
-                                                <span id="invoice-tax">$0.00</span>
+                                                <span id="invoice-tax">₱0.00</span>
                                             </div>
                                             <hr>
                                             <div class="d-flex justify-content-between h5">
                                                 <span>Total:</span>
-                                                <span id="invoice-total">$0.00</span>
+                                                <span id="invoice-total">₱0.00</span>
                                             </div>
                                         </div>
                                     </div>
@@ -493,7 +493,7 @@ function addServiceRow() {
             </div>
             <div class="col-md-1">
                 <div class="input-group">
-                    <span class="input-group-text">$</span>
+                    <span class="input-group-text">₱</span>
                     <input type="number" class="form-control service-total" placeholder="0.00" readonly>
                 </div>
             </div>
@@ -533,14 +533,13 @@ function calculateInvoiceTotal() {
         subtotal += parseFloat(input.value) || 0;
     });
 
-    const tax = subtotal * 0.08; // 8% tax
-    const total = subtotal + tax;
+    const total = subtotal; // No tax
 
     document.getElementById(
         "invoice-subtotal"
-    ).textContent = `$${subtotal.toFixed(2)}`;
-    document.getElementById("invoice-tax").textContent = `$${tax.toFixed(2)}`;
-    document.getElementById("invoice-total").textContent = `$${total.toFixed(
+    ).textContent = `₱${subtotal.toFixed(2)}`;
+    // Remove document.getElementById("invoice-tax") line
+    document.getElementById("invoice-total").textContent = `₱${total.toFixed(
         2
     )}`;
 }
@@ -594,8 +593,7 @@ function handleCreateInvoice(event) {
         (sum, service) => sum + service.quantity * service.price,
         0
     );
-    const tax = subtotal * 0.08;
-    const total = subtotal + tax;
+    const total = subtotal;
 
     // Generate invoice number
     const invoiceNumber = `BBC-${new Date().getFullYear()}-${String(
