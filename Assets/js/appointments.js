@@ -1046,11 +1046,157 @@ window.handleEditAppointment = handleEditAppointment;
 
 // Show new appointment modal (admin)
 function showNewAppointmentModal() {
-    // Implementation for admin to create appointments for any client
-    showAlert(
-        "Admin new appointment functionality will be implemented",
-        "info"
+    const clients = getAllClients();
+    const modalHtml = `
+        <div class="modal fade" id="newAppointmentModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Create New Appointment</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="new-appointment-form">
+                            <div class="mb-3">
+                                <label class="form-label">Client</label>
+                                <select class="form-select" id="new-client" onchange="loadClientPetsForNew()" required>
+                                    <option value="">Select Client</option>
+                                    ${clients
+                                        .map(
+                                            (client) =>
+                                                `<option value="${client.id}">${client.name}</option>`
+                                        )
+                                        .join("")}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Pet</label>
+                                <select class="form-select" id="new-pet" required>
+                                    <option value="">Select Pet</option>
+                                </select>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Date</label>
+                                    <input type="date" class="form-control" id="new-date" min="${
+                                        new Date().toISOString().split("T")[0]
+                                    }" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Time</label>
+                                    <input type="time" class="form-control" id="new-time" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Veterinarian</label>
+                                <select class="form-select" id="new-veterinarian" required>
+                                    <option value="">Select Veterinarian</option>
+                                    <option value="Dr. Sarah Johnson">Dr. Sarah Johnson (General Care)</option>
+                                    <option value="Dr. Michael Chen">Dr. Michael Chen (Surgery)</option>
+                                    <option value="Dr. Emily Rodriguez">Dr. Emily Rodriguez (Dental)</option>
+                                    <option value="Dr. James Wilson">Dr. James Wilson (Exotics)</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Reason</label>
+                                <input type="text" class="form-control" id="new-reason" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Notes</label>
+                                <textarea class="form-control" id="new-notes" rows="3"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-success" onclick="handleNewAppointment()">
+                            <i class="fas fa-save me-2"></i>Create Appointment
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Add to DOM and show (same as others)
+    const existingModal = document.getElementById("newAppointmentModal");
+    if (existingModal) existingModal.remove();
+    document.getElementById("modal-container").innerHTML += modalHtml;
+    const modal = new bootstrap.Modal(
+        document.getElementById("newAppointmentModal")
     );
+    modal.show();
+}
+
+// Load pets for selected client
+function loadClientPetsForNew() {
+    const clientId = document.getElementById("new-client").value;
+    const petSelect = document.getElementById("new-pet");
+    petSelect.innerHTML = '<option value="">Select Pet</option>';
+    if (clientId) {
+        const clientPets = JSON.parse(
+            localStorage.getItem(`bbc_clinic_pets_${clientId}`) || "[]"
+        );
+        clientPets.forEach((pet) => {
+            const option = document.createElement("option");
+            option.value = pet.id;
+            option.textContent = `${pet.name} (${pet.species})`;
+            petSelect.appendChild(option);
+        });
+    }
+}
+
+// Handle new appointment creation
+function handleNewAppointment() {
+    const clientId = document.getElementById("new-client").value;
+    const petId = document.getElementById("new-pet").value;
+    const date = document.getElementById("new-date").value;
+    const time = document.getElementById("new-time").value;
+    const veterinarian = document.getElementById("new-veterinarian").value;
+    const reason = document.getElementById("new-reason").value;
+    const notes = document.getElementById("new-notes").value.trim();
+
+    if (!clientId || !petId || !date || !time || !veterinarian || !reason) {
+        showAlert("All required fields must be filled", "danger");
+        return;
+    }
+
+    const client = getAllClients().find((c) => c.id === clientId);
+    const clientPets = JSON.parse(
+        localStorage.getItem(`bbc_clinic_pets_${clientId}`) || "[]"
+    );
+    const pet = clientPets.find((p) => p.id === petId);
+
+    const appointmentData = {
+        id: generateId("apt"),
+        ownerId: clientId,
+        petId,
+        petName: pet.name,
+        date,
+        time,
+        veterinarian,
+        reason,
+        notes,
+        status: "pending",
+        createdAt: new Date().toISOString(),
+    };
+
+    const ownerAppointments = JSON.parse(
+        localStorage.getItem(`bbc_clinic_appointments_${clientId}`) || "[]"
+    );
+    ownerAppointments.push(appointmentData);
+    localStorage.setItem(
+        `bbc_clinic_appointments_${clientId}`,
+        JSON.stringify(ownerAppointments)
+    );
+
+    const modal = bootstrap.Modal.getInstance(
+        document.getElementById("newAppointmentModal")
+    );
+    if (modal) modal.hide();
+    cleanupModals();
+    renderAppointmentsPage();
+    showAlert("New appointment created successfully!", "success");
 }
 
 // Calendar navigation functions
