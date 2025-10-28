@@ -2,9 +2,9 @@
 
 // Render appointments page
 function renderAppointmentsPage() {
-    const appointmentsPage = document.getElementById('appointments-page');
-    
-    if (AppState.userType === 'admin') {
+    const appointmentsPage = document.getElementById("appointments-page");
+
+    if (AppState.userType === "admin") {
         renderAdminAppointmentsPage(appointmentsPage);
     } else {
         renderUserAppointmentsPage(appointmentsPage);
@@ -14,17 +14,17 @@ function renderAppointmentsPage() {
 // Render admin appointments page
 function renderAdminAppointmentsPage(container) {
     const allAppointments = getAllAppointments();
-    
+
     container.innerHTML = `
         <div class="row mb-4">
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h2 class="fw-bold text-primary mb-0">
+                        <h2 class="fw-bold text-white mb-0">
                             <i class="fas fa-calendar-alt me-2"></i>
                             Appointment Management
                         </h2>
-                        <p class="text-muted">Manage all clinic appointments</p>
+                        <p class="text-white">Manage all clinic appointments</p>
                     </div>
                     <button class="btn btn-primary" onclick="showNewAppointmentModal()">
                         <i class="fas fa-plus me-2"></i>New Appointment
@@ -121,7 +121,7 @@ function renderAdminAppointmentsPage(container) {
             </div>
         </div>
     `;
-    
+
     updateAppointmentStats();
 }
 
@@ -132,20 +132,24 @@ function renderUserAppointmentsPage(container) {
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h2 class="fw-bold text-primary mb-0">
+                        <h2 class="fw-bold text-white mb-0">
                             <i class="fas fa-calendar-check me-2"></i>
                             My Appointments
                         </h2>
-                        <p class="text-muted">Manage your pet appointments</p>
+                        <p class="text-white">Manage your pet appointments</p>
                     </div>
-                    <button class="btn btn-primary" onclick="showBookAppointmentModal()" ${AppState.pets.length === 0 ? 'disabled' : ''}>
+                    <button class="btn btn-primary" onclick="showBookAppointmentModal()" ${
+                        AppState.pets.length === 0 ? "disabled" : ""
+                    }>
                         <i class="fas fa-plus me-2"></i>Book Appointment
                     </button>
                 </div>
             </div>
         </div>
         
-        ${AppState.pets.length === 0 ? `
+        ${
+            AppState.pets.length === 0
+                ? `
             <div class="row">
                 <div class="col-12">
                     <div class="card text-center py-5">
@@ -160,7 +164,8 @@ function renderUserAppointmentsPage(container) {
                     </div>
                 </div>
             </div>
-        ` : `
+        `
+                : `
             <!-- Upcoming Appointments -->
             <div class="row mb-4">
                 <div class="col-12">
@@ -193,9 +198,10 @@ function renderUserAppointmentsPage(container) {
                     </div>
                 </div>
             </div>
-        `}
+        `
+        }
     `;
-    
+
     if (AppState.pets.length > 0) {
         updateUserAppointmentCounts();
     }
@@ -206,17 +212,27 @@ function renderAppointmentCalendar() {
     const today = new Date();
     const currentMonth = today.getMonth();
     const currentYear = today.getFullYear();
-    
+
     const firstDay = new Date(currentYear, currentMonth, 1);
     const lastDay = new Date(currentYear, currentMonth + 1, 0);
     const daysInMonth = lastDay.getDate();
     const startingDayOfWeek = firstDay.getDay();
-    
+
     const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
     ];
-    
+
     let calendarHtml = `
         <div class="calendar-container">
             <div class="calendar-header">
@@ -238,36 +254,51 @@ function renderAppointmentCalendar() {
                 <div class="calendar-day fw-bold text-center py-2 bg-light">Fri</div>
                 <div class="calendar-day fw-bold text-center py-2 bg-light">Sat</div>
     `;
-    
+
     // Empty cells before the first day
     for (let i = 0; i < startingDayOfWeek; i++) {
         calendarHtml += '<div class="calendar-day"></div>';
     }
-    
+
     // Days of the month
     for (let day = 1; day <= daysInMonth; day++) {
-        const date = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const date = `${currentYear}-${String(currentMonth + 1).padStart(
+            2,
+            "0"
+        )}-${String(day).padStart(2, "0")}`;
         const appointments = getAppointmentsForDate(date);
-        const isToday = day === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
-        
+        const isToday =
+            day === today.getDate() &&
+            currentMonth === today.getMonth() &&
+            currentYear === today.getFullYear();
+
         calendarHtml += `
-            <div class="calendar-day ${appointments.length > 0 ? 'has-appointment' : ''} ${isToday ? 'selected' : ''}" 
+            <div class="calendar-day ${
+                appointments.length > 0 ? "has-appointment" : ""
+            } ${isToday ? "selected" : ""}" 
                  onclick="showDayAppointments('${date}')">
                 <div>${day}</div>
-                ${appointments.length > 0 ? `<small class="text-success">${appointments.length}</small>` : ''}
+                ${
+                    appointments.length > 0
+                        ? `<small class="text-success">${appointments.length}</small>`
+                        : ""
+                }
             </div>
         `;
     }
-    
-    calendarHtml += '</div></div>';
-    
+
+    calendarHtml += "</div></div>";
+
     return calendarHtml;
 }
 
 // Get appointments for a specific date
 function getAppointmentsForDate(date) {
-    const allAppointments = AppState.userType === 'admin' ? getAllAppointments() : AppState.appointments;
-    return allAppointments.filter(apt => apt.date === date);
+    const allAppointments =
+        AppState.userType === "admin"
+            ? getAllAppointments()
+            : AppState.appointments;
+    return allAppointments.filter((apt) => apt.date === date);
 }
 
 // Render appointments list
@@ -280,16 +311,25 @@ function renderAppointmentsList(appointments) {
             </div>
         `;
     }
-    
+
     return appointments
-        .sort((a, b) => new Date(b.date + ' ' + b.time) - new Date(a.date + ' ' + a.time))
-        .map(appointment => `
+        .sort(
+            (a, b) =>
+                new Date(b.date + " " + b.time) -
+                new Date(a.date + " " + a.time)
+        )
+        .map(
+            (appointment) => `
             <div class="appointment-card ${appointment.status} mb-3">
                 <div class="d-flex justify-content-between align-items-start">
                     <div class="flex-grow-1">
                         <div class="d-flex align-items-center mb-2">
-                            <h6 class="fw-bold mb-0 me-2">${appointment.petName}</h6>
-                            <span class="status-badge status-${appointment.status}">
+                            <h6 class="fw-bold mb-0 me-2">${
+                                appointment.petName
+                            }</h6>
+                            <span class="status-badge status-${
+                                appointment.status
+                            }">
                                 ${capitalizeFirst(appointment.status)}
                             </span>
                         </div>
@@ -317,19 +357,27 @@ function renderAppointmentsList(appointments) {
                             </div>
                         </div>
                         
-                        ${AppState.userType === 'admin' ? `
+                        ${
+                            AppState.userType === "admin"
+                                ? `
                             <p class="text-muted mb-0 small">
                                 <i class="fas fa-user me-1"></i>
                                 Owner: ${getOwnerName(appointment.ownerId)}
                             </p>
-                        ` : ''}
+                        `
+                                : ""
+                        }
                         
-                        ${appointment.notes ? `
+                        ${
+                            appointment.notes
+                                ? `
                             <p class="text-muted mb-0 small mt-2">
                                 <i class="fas fa-sticky-note me-1"></i>
                                 ${appointment.notes}
                             </p>
-                        ` : ''}
+                        `
+                                : ""
+                        }
                     </div>
                     
                     <div class="dropdown">
@@ -337,41 +385,60 @@ function renderAppointmentsList(appointments) {
                             <i class="fas fa-ellipsis-v"></i>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#" onclick="viewAppointmentDetails('${appointment.id}')">
+                            <li><a class="dropdown-item" href="#" onclick="viewAppointmentDetails('${
+                                appointment.id
+                            }')">
                                 <i class="fas fa-eye me-2"></i>View Details
                             </a></li>
-                            ${appointment.status === 'pending' || appointment.status === 'confirmed' ? `
+                            ${
+                                appointment.status === "pending" ||
+                                appointment.status === "confirmed"
+                                    ? `
                                 <li><a class="dropdown-item" href="#" onclick="editAppointment('${appointment.id}')">
                                     <i class="fas fa-edit me-2"></i>Edit
                                 </a></li>
-                            ` : ''}
-                            ${AppState.userType === 'admin' ? `
+                            `
+                                    : ""
+                            }
+                            ${
+                                AppState.userType === "admin"
+                                    ? `
                                 <li><a class="dropdown-item" href="#" onclick="updateAppointmentStatus('${appointment.id}', 'confirmed')">
                                     <i class="fas fa-check me-2"></i>Confirm
                                 </a></li>
                                 <li><a class="dropdown-item" href="#" onclick="updateAppointmentStatus('${appointment.id}', 'completed')">
                                     <i class="fas fa-check-double me-2"></i>Mark Complete
                                 </a></li>
-                            ` : ''}
+                            `
+                                    : ""
+                            }
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="#" onclick="cancelAppointment('${appointment.id}')">
+                            <li><a class="dropdown-item text-danger" href="#" onclick="cancelAppointment('${
+                                appointment.id
+                            }')">
                                 <i class="fas fa-times me-2"></i>Cancel
                             </a></li>
                         </ul>
                     </div>
                 </div>
             </div>
-        `).join('');
+        `
+        )
+        .join("");
 }
 
 // Render upcoming appointments for user
 function renderUpcomingAppointments() {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Date().toISOString().split("T")[0];
     const upcomingAppointments = AppState.appointments
-        .filter(apt => apt.date >= today && apt.status !== 'cancelled')
-        .sort((a, b) => new Date(a.date + ' ' + a.time) - new Date(b.date + ' ' + b.time))
+        .filter((apt) => apt.date >= today && apt.status !== "cancelled")
+        .sort(
+            (a, b) =>
+                new Date(a.date + " " + a.time) -
+                new Date(b.date + " " + b.time)
+        )
         .slice(0, 3);
-    
+
     if (upcomingAppointments.length === 0) {
         return `
             <div class="text-center py-3">
@@ -382,15 +449,19 @@ function renderUpcomingAppointments() {
             </div>
         `;
     }
-    
-    return upcomingAppointments.map(appointment => `
+
+    return upcomingAppointments
+        .map(
+            (appointment) => `
         <div class="appointment-card ${appointment.status} mb-3">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <h6 class="fw-bold mb-1">${appointment.petName}</h6>
                     <p class="text-muted mb-1 small">
                         <i class="fas fa-calendar me-1"></i>
-                        ${formatDate(appointment.date)} at ${formatTime(appointment.time)}
+                        ${formatDate(appointment.date)} at ${formatTime(
+                appointment.time
+            )}
                     </p>
                     <p class="text-muted mb-0 small">${appointment.reason}</p>
                 </div>
@@ -399,13 +470,15 @@ function renderUpcomingAppointments() {
                 </span>
             </div>
         </div>
-    `).join('');
+    `
+        )
+        .join("");
 }
 
 // Show book appointment modal
 function showBookAppointmentModal() {
-    const selectedPetId = sessionStorage.getItem('selectedPetId');
-    
+    const selectedPetId = sessionStorage.getItem("selectedPetId");
+
     const modalHtml = `
         <div class="modal fade" id="bookAppointmentModal" tabindex="-1">
             <div class="modal-dialog modal-lg">
@@ -424,17 +497,29 @@ function showBookAppointmentModal() {
                                     <label class="form-label">Select Pet *</label>
                                     <select class="form-select" id="appointment-pet" required>
                                         <option value="">Choose a pet</option>
-                                        ${AppState.pets.map(pet => `
-                                            <option value="${pet.id}" ${pet.id === selectedPetId ? 'selected' : ''}>
+                                        ${AppState.pets
+                                            .map(
+                                                (pet) => `
+                                            <option value="${pet.id}" ${
+                                                    pet.id === selectedPetId
+                                                        ? "selected"
+                                                        : ""
+                                                }>
                                                 ${pet.name} (${pet.species})
                                             </option>
-                                        `).join('')}
+                                        `
+                                            )
+                                            .join("")}
                                     </select>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Appointment Date *</label>
                                     <input type="date" class="form-control" id="appointment-date" 
-                                           min="${new Date().toISOString().split('T')[0]}" required>
+                                           min="${
+                                               new Date()
+                                                   .toISOString()
+                                                   .split("T")[0]
+                                           }" required>
                                 </div>
                             </div>
                             
@@ -490,158 +575,192 @@ function showBookAppointmentModal() {
             </div>
         </div>
     `;
-    
+
     // Remove existing modal
-    const existingModal = document.getElementById('bookAppointmentModal');
+    const existingModal = document.getElementById("bookAppointmentModal");
     if (existingModal) {
         existingModal.remove();
     }
-    
+
     // Add modal to page
-    document.getElementById('modal-container').innerHTML = modalHtml;
-    
+    document.getElementById("modal-container").innerHTML = modalHtml;
+
     // Clear selected pet from session storage
-    sessionStorage.removeItem('selectedPetId');
-    
+    sessionStorage.removeItem("selectedPetId");
+
     // Show modal
-    const modal = new bootstrap.Modal(document.getElementById('bookAppointmentModal'));
+    const modal = new bootstrap.Modal(
+        document.getElementById("bookAppointmentModal")
+    );
     modal.show();
 }
 
 // Handle book appointment form submission
 function handleBookAppointment(event) {
     event.preventDefault();
-    
-    const petId = document.getElementById('appointment-pet').value;
-    const date = document.getElementById('appointment-date').value;
-    const time = document.getElementById('appointment-time').value;
-    const reason = document.getElementById('appointment-reason').value;
-    const notes = document.getElementById('appointment-notes').value.trim();
-    
+
+    const petId = document.getElementById("appointment-pet").value;
+    const date = document.getElementById("appointment-date").value;
+    const time = document.getElementById("appointment-time").value;
+    const reason = document.getElementById("appointment-reason").value;
+    const notes = document.getElementById("appointment-notes").value.trim();
+
     // Find the selected pet
-    const selectedPet = AppState.pets.find(pet => pet.id === petId);
+    const selectedPet = AppState.pets.find((pet) => pet.id === petId);
     if (!selectedPet) {
-        showAlert('Please select a valid pet', 'danger');
+        showAlert("Please select a valid pet", "danger");
         return;
     }
-    
+
     // Check if the appointment time is already taken
-    const existingAppointment = AppState.appointments.find(apt => 
-        apt.date === date && apt.time === time && apt.status !== 'cancelled'
+    const existingAppointment = AppState.appointments.find(
+        (apt) =>
+            apt.date === date && apt.time === time && apt.status !== "cancelled"
     );
-    
+
     if (existingAppointment) {
-        showAlert('This time slot is already booked. Please choose another time.', 'warning');
+        showAlert(
+            "This time slot is already booked. Please choose another time.",
+            "warning"
+        );
         return;
     }
-    
+
     const appointmentData = {
-        id: generateId('apt'),
+        id: generateId("apt"),
         petId: petId,
         petName: selectedPet.name,
         ownerId: AppState.currentUser.id,
         date: date,
         time: time,
         reason: reason,
-        status: 'pending',
-        veterinarian: 'Dr. Sarah Johnson',
+        status: "pending",
+        veterinarian: "Dr. Sarah Johnson",
         notes: notes,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
     };
-    
+
     // Add appointment
     AppState.appointments.push(appointmentData);
     saveUserData();
-    
+
     // Close modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('bookAppointmentModal'));
+    const modal = bootstrap.Modal.getInstance(
+        document.getElementById("bookAppointmentModal")
+    );
     modal.hide();
-    
+
     // Refresh appointments page
     renderAppointmentsPage();
-    
-    showAlert(`Appointment booked for ${selectedPet.name} on ${formatDate(date)} at ${formatTime(time)}`, 'success');
+
+    showAlert(
+        `Appointment booked for ${selectedPet.name} on ${formatDate(
+            date
+        )} at ${formatTime(time)}`,
+        "success"
+    );
 }
 
 // Update appointment stats
 function updateAppointmentStats() {
     const allAppointments = getAllAppointments();
-    const today = new Date().toISOString().split('T')[0];
-    
+    const today = new Date().toISOString().split("T")[0];
+
     // Today's appointments
-    const todayAppointments = allAppointments.filter(apt => apt.date === today);
-    document.getElementById('today-appointments-count').textContent = todayAppointments.length;
-    
+    const todayAppointments = allAppointments.filter(
+        (apt) => apt.date === today
+    );
+    document.getElementById("today-appointments-count").textContent =
+        todayAppointments.length;
+
     // This week's appointments
     const startOfWeek = new Date();
     startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(endOfWeek.getDate() + 6);
-    
-    const weekAppointments = allAppointments.filter(apt => {
+
+    const weekAppointments = allAppointments.filter((apt) => {
         const aptDate = new Date(apt.date);
         return aptDate >= startOfWeek && aptDate <= endOfWeek;
     });
-    document.getElementById('week-appointments-count').textContent = weekAppointments.length;
-    
+    document.getElementById("week-appointments-count").textContent =
+        weekAppointments.length;
+
     // Status counts
-    const pendingCount = allAppointments.filter(apt => apt.status === 'pending').length;
-    const confirmedCount = allAppointments.filter(apt => apt.status === 'confirmed').length;
-    
-    document.getElementById('pending-appointments-count').textContent = pendingCount;
-    document.getElementById('confirmed-appointments-count').textContent = confirmedCount;
+    const pendingCount = allAppointments.filter(
+        (apt) => apt.status === "pending"
+    ).length;
+    const confirmedCount = allAppointments.filter(
+        (apt) => apt.status === "confirmed"
+    ).length;
+
+    document.getElementById("pending-appointments-count").textContent =
+        pendingCount;
+    document.getElementById("confirmed-appointments-count").textContent =
+        confirmedCount;
 }
 
 // Update user appointment counts
 function updateUserAppointmentCounts() {
-    const today = new Date().toISOString().split('T')[0];
-    const upcomingCount = AppState.appointments.filter(apt => 
-        apt.date >= today && apt.status !== 'cancelled'
+    const today = new Date().toISOString().split("T")[0];
+    const upcomingCount = AppState.appointments.filter(
+        (apt) => apt.date >= today && apt.status !== "cancelled"
     ).length;
-    
-    document.getElementById('upcoming-count').textContent = upcomingCount;
+
+    document.getElementById("upcoming-count").textContent = upcomingCount;
 }
 
 // Update appointment status (admin only)
 function updateAppointmentStatus(appointmentId, newStatus) {
-    if (AppState.userType !== 'admin') {
-        showAlert('Access denied', 'danger');
+    if (AppState.userType !== "admin") {
+        showAlert("Access denied", "danger");
         return;
     }
-    
+
     const allAppointments = getAllAppointments();
-    const appointment = allAppointments.find(apt => apt.id === appointmentId);
-    
+    const appointment = allAppointments.find((apt) => apt.id === appointmentId);
+
     if (!appointment) {
-        showAlert('Appointment not found', 'danger');
+        showAlert("Appointment not found", "danger");
         return;
     }
-    
+
     // Update the appointment in the owner's data
-    const ownerAppointments = JSON.parse(localStorage.getItem(`bbc_clinic_appointments_${appointment.ownerId}`) || '[]');
-    const appointmentIndex = ownerAppointments.findIndex(apt => apt.id === appointmentId);
-    
+    const ownerAppointments = JSON.parse(
+        localStorage.getItem(
+            `bbc_clinic_appointments_${appointment.ownerId}`
+        ) || "[]"
+    );
+    const appointmentIndex = ownerAppointments.findIndex(
+        (apt) => apt.id === appointmentId
+    );
+
     if (appointmentIndex !== -1) {
         ownerAppointments[appointmentIndex].status = newStatus;
-        localStorage.setItem(`bbc_clinic_appointments_${appointment.ownerId}`, JSON.stringify(ownerAppointments));
-        
+        localStorage.setItem(
+            `bbc_clinic_appointments_${appointment.ownerId}`,
+            JSON.stringify(ownerAppointments)
+        );
+
         renderAppointmentsPage();
-        showAlert(`Appointment status updated to ${newStatus}`, 'success');
+        showAlert(`Appointment status updated to ${newStatus}`, "success");
     }
 }
 
 // Cancel appointment
 function cancelAppointment(appointmentId) {
-    if (confirm('Are you sure you want to cancel this appointment?')) {
-        if (AppState.userType === 'admin') {
-            updateAppointmentStatus(appointmentId, 'cancelled');
+    if (confirm("Are you sure you want to cancel this appointment?")) {
+        if (AppState.userType === "admin") {
+            updateAppointmentStatus(appointmentId, "cancelled");
         } else {
-            const appointmentIndex = AppState.appointments.findIndex(apt => apt.id === appointmentId);
+            const appointmentIndex = AppState.appointments.findIndex(
+                (apt) => apt.id === appointmentId
+            );
             if (appointmentIndex !== -1) {
-                AppState.appointments[appointmentIndex].status = 'cancelled';
+                AppState.appointments[appointmentIndex].status = "cancelled";
                 saveUserData();
                 renderAppointmentsPage();
-                showAlert('Appointment cancelled', 'success');
+                showAlert("Appointment cancelled", "success");
             }
         }
     }
@@ -650,43 +769,49 @@ function cancelAppointment(appointmentId) {
 // View appointment details
 function viewAppointmentDetails(appointmentId) {
     // Implementation for viewing appointment details
-    showAlert('View appointment details functionality will be implemented', 'info');
+    showAlert(
+        "View appointment details functionality will be implemented",
+        "info"
+    );
 }
 
 // Edit appointment
 function editAppointment(appointmentId) {
     // Implementation for editing appointments
-    showAlert('Edit appointment functionality will be implemented', 'info');
+    showAlert("Edit appointment functionality will be implemented", "info");
 }
 
 // Show new appointment modal (admin)
 function showNewAppointmentModal() {
     // Implementation for admin to create appointments for any client
-    showAlert('Admin new appointment functionality will be implemented', 'info');
+    showAlert(
+        "Admin new appointment functionality will be implemented",
+        "info"
+    );
 }
 
 // Calendar navigation functions
 function changeMonth(direction) {
     // Implementation for calendar month navigation
-    showAlert('Calendar navigation will be implemented', 'info');
+    showAlert("Calendar navigation will be implemented", "info");
 }
 
 function showDayAppointments(date) {
     // Implementation for showing appointments for a specific day
-    showAlert(`Show appointments for ${date}`, 'info');
+    showAlert(`Show appointments for ${date}`, "info");
 }
 
 // Filter appointments
 function filterAppointments() {
     // Implementation for filtering appointments
-    showAlert('Filter appointments functionality will be implemented', 'info');
+    showAlert("Filter appointments functionality will be implemented", "info");
 }
 
 // Clear filters
 function clearFilters() {
-    document.getElementById('status-filter').value = '';
-    document.getElementById('date-from').value = '';
-    document.getElementById('date-to').value = '';
+    document.getElementById("status-filter").value = "";
+    document.getElementById("date-from").value = "";
+    document.getElementById("date-to").value = "";
     filterAppointments();
 }
 

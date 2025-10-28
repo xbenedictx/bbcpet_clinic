@@ -2,9 +2,9 @@
 
 // Render dashboard based on user type
 function renderDashboard() {
-    const dashboardPage = document.getElementById('dashboard-page');
-    
-    if (AppState.userType === 'admin') {
+    const dashboardPage = document.getElementById("dashboard-page");
+
+    if (AppState.userType === "admin") {
         renderAdminDashboard(dashboardPage);
     } else {
         renderUserDashboard(dashboardPage);
@@ -16,11 +16,11 @@ function renderAdminDashboard(container) {
     container.innerHTML = `
         <div class="row mb-4">
             <div class="col-12">
-                <h2 class="fw-bold text-primary mb-0">
+                <h2 class="fw-bold mb-0 text-white">
                     <i class="fas fa-tachometer-alt me-2"></i>
                     Admin Dashboard
                 </h2>
-                <p class="text-muted">Welcome back, ${AppState.currentUser.firstName}!</p>
+                <p class="text-white">Welcome back, ${AppState.currentUser.firstName}!</p>
             </div>
         </div>
         
@@ -134,7 +134,7 @@ function renderAdminDashboard(container) {
             </div>
         </div>
     `;
-    
+
     // Load admin dashboard data
     loadAdminDashboardData();
 }
@@ -144,11 +144,11 @@ function renderUserDashboard(container) {
     container.innerHTML = `
         <div class="row mb-4">
             <div class="col-12">
-                <h2 class="fw-bold text-primary mb-0">
+                <h2 class="fw-bold text-white mb-0">
                     <i class="fas fa-home me-2"></i>
                     Welcome, ${AppState.currentUser.firstName}!
                 </h2>
-                <p class="text-muted">Manage your pets' health and appointments</p>
+                <p class="text-white">Manage your pets' health and appointments</p>
             </div>
         </div>
         
@@ -267,7 +267,7 @@ function renderUserDashboard(container) {
             </div>
         </div>
     `;
-    
+
     // Load user dashboard data
     loadUserDashboardData();
 }
@@ -279,29 +279,40 @@ function loadAdminDashboardData() {
     const allPets = getAllPets();
     const allAppointments = getAllAppointments();
     const allInvoices = getAllInvoices();
-    
+
     // Update stats
-    document.getElementById('total-clients').textContent = allClients.length;
-    document.getElementById('total-pets').textContent = allPets.length;
-    
+    document.getElementById("total-clients").textContent = allClients.length;
+    document.getElementById("total-pets").textContent = allPets.length;
+
     // Today's appointments
-    const today = new Date().toISOString().split('T')[0];
-    const todayAppointments = allAppointments.filter(apt => apt.date === today);
-    document.getElementById('today-appointments').textContent = todayAppointments.length;
-    
+    const today = new Date().toISOString().split("T")[0];
+    const todayAppointments = allAppointments.filter(
+        (apt) => apt.date === today
+    );
+    document.getElementById("today-appointments").textContent =
+        todayAppointments.length;
+
     // Monthly revenue
     const currentMonth = new Date().getMonth();
     const currentYear = new Date().getFullYear();
-    const monthlyInvoices = allInvoices.filter(inv => {
+    const monthlyInvoices = allInvoices.filter((inv) => {
         const invDate = new Date(inv.date);
-        return invDate.getMonth() === currentMonth && invDate.getFullYear() === currentYear;
+        return (
+            invDate.getMonth() === currentMonth &&
+            invDate.getFullYear() === currentYear
+        );
     });
-    const monthlyRevenue = monthlyInvoices.reduce((sum, inv) => sum + inv.total, 0);
-    document.getElementById('monthly-revenue').textContent = `$${monthlyRevenue.toFixed(2)}`;
-    
+    const monthlyRevenue = monthlyInvoices.reduce(
+        (sum, inv) => sum + inv.total,
+        0
+    );
+    document.getElementById(
+        "monthly-revenue"
+    ).textContent = `$${monthlyRevenue.toFixed(2)}`;
+
     // Load recent appointments
     loadRecentAppointments();
-    
+
     // Load pending actions
     loadPendingActions();
 }
@@ -309,47 +320,58 @@ function loadAdminDashboardData() {
 // Load user dashboard data
 function loadUserDashboardData() {
     // Update stats
-    document.getElementById('user-total-pets').textContent = AppState.pets.length;
-    
+    document.getElementById("user-total-pets").textContent =
+        AppState.pets.length;
+
     // Upcoming appointments
-    const today = new Date().toISOString().split('T')[0];
-    const upcomingAppointments = AppState.appointments.filter(apt => apt.date >= today);
-    document.getElementById('user-upcoming-appointments').textContent = upcomingAppointments.length;
-    
+    const today = new Date().toISOString().split("T")[0];
+    const upcomingAppointments = AppState.appointments.filter(
+        (apt) => apt.date >= today
+    );
+    document.getElementById("user-upcoming-appointments").textContent =
+        upcomingAppointments.length;
+
     // Health records
-    document.getElementById('user-health-records').textContent = AppState.healthRecords.length;
-    
+    document.getElementById("user-health-records").textContent =
+        AppState.healthRecords.length;
+
     // Invoices
-    document.getElementById('user-invoices').textContent = AppState.invoices.length;
-    
+    document.getElementById("user-invoices").textContent =
+        AppState.invoices.length;
+
     // Load pets list
     loadUserPetsList();
-    
+
     // Load upcoming appointments list
     loadUserUpcomingAppointments();
 }
 
 // Load recent appointments for admin
 function loadRecentAppointments() {
-    const container = document.getElementById('recent-appointments');
+    const container = document.getElementById("recent-appointments");
     const allAppointments = getAllAppointments();
     const recentAppointments = allAppointments
         .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
         .slice(0, 5);
-    
+
     if (recentAppointments.length === 0) {
-        container.innerHTML = '<p class="text-muted text-center py-3">No recent appointments</p>';
+        container.innerHTML =
+            '<p class="text-muted text-center py-3">No recent appointments</p>';
         return;
     }
-    
-    container.innerHTML = recentAppointments.map(appointment => `
+
+    container.innerHTML = recentAppointments
+        .map(
+            (appointment) => `
         <div class="appointment-card ${appointment.status} mb-3">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
                     <h6 class="fw-bold mb-1">${appointment.petName}</h6>
                     <p class="text-muted mb-1 small">
                         <i class="fas fa-calendar me-1"></i>
-                        ${formatDate(appointment.date)} at ${formatTime(appointment.time)}
+                        ${formatDate(appointment.date)} at ${formatTime(
+                appointment.time
+            )}
                     </p>
                     <p class="text-muted mb-0 small">${appointment.reason}</p>
                 </div>
@@ -358,35 +380,44 @@ function loadRecentAppointments() {
                 </span>
             </div>
         </div>
-    `).join('');
+    `
+        )
+        .join("");
 }
 
 // Load pending actions for admin
 function loadPendingActions() {
-    const container = document.getElementById('pending-actions');
+    const container = document.getElementById("pending-actions");
     const allAppointments = getAllAppointments();
-    const pendingAppointments = allAppointments.filter(apt => apt.status === 'pending');
-    
+    const pendingAppointments = allAppointments.filter(
+        (apt) => apt.status === "pending"
+    );
+
     const actions = [];
-    
+
     // Pending appointments
     if (pendingAppointments.length > 0) {
         actions.push({
-            icon: 'calendar-check',
-            text: `${pendingAppointments.length} pending appointment${pendingAppointments.length > 1 ? 's' : ''}`,
-            action: 'showAppointments()',
-            color: 'warning'
+            icon: "calendar-check",
+            text: `${pendingAppointments.length} pending appointment${
+                pendingAppointments.length > 1 ? "s" : ""
+            }`,
+            action: "showAppointments()",
+            color: "warning",
         });
     }
-    
+
     // Add more pending actions as needed
-    
+
     if (actions.length === 0) {
-        container.innerHTML = '<p class="text-muted text-center py-3">No pending actions</p>';
+        container.innerHTML =
+            '<p class="text-muted text-center py-3">No pending actions</p>';
         return;
     }
-    
-    container.innerHTML = actions.map(action => `
+
+    container.innerHTML = actions
+        .map(
+            (action) => `
         <div class="d-flex align-items-center mb-3 p-2 border rounded cursor-pointer" onclick="${action.action}">
             <div class="me-3">
                 <i class="fas fa-${action.icon} text-${action.color}"></i>
@@ -398,13 +429,15 @@ function loadPendingActions() {
                 <i class="fas fa-chevron-right text-muted small"></i>
             </div>
         </div>
-    `).join('');
+    `
+        )
+        .join("");
 }
 
 // Load user pets list
 function loadUserPetsList() {
-    const container = document.getElementById('user-pets-list');
-    
+    const container = document.getElementById("user-pets-list");
+
     if (AppState.pets.length === 0) {
         container.innerHTML = `
             <div class="text-center py-4">
@@ -417,26 +450,37 @@ function loadUserPetsList() {
         `;
         return;
     }
-    
-    container.innerHTML = AppState.pets.slice(0, 3).map(pet => `
+
+    container.innerHTML = AppState.pets
+        .slice(0, 3)
+        .map(
+            (pet) => `
         <div class="pet-card">
             <div class="d-flex align-items-center">
                 <div class="pet-avatar">
-                    <i class="fas fa-${pet.species.toLowerCase() === 'dog' ? 'dog' : 'cat'}"></i>
+                    <i class="fas fa-${
+                        pet.species.toLowerCase() === "dog" ? "dog" : "cat"
+                    }"></i>
                 </div>
                 <div class="flex-grow-1">
                     <h6 class="fw-bold mb-1">${pet.name}</h6>
-                    <p class="text-muted mb-0 small">${pet.breed} • ${pet.age} years old</p>
+                    <p class="text-muted mb-0 small">${pet.breed} • ${
+                pet.age
+            } years old</p>
                 </div>
                 <div>
-                    <button class="btn btn-sm btn-outline-primary" onclick="viewPetDetails('${pet.id}')">
+                    <button class="btn btn-sm btn-outline-primary" onclick="viewPetDetails('${
+                        pet.id
+                    }')">
                         View
                     </button>
                 </div>
             </div>
         </div>
-    `).join('');
-    
+    `
+        )
+        .join("");
+
     if (AppState.pets.length > 3) {
         container.innerHTML += `
             <div class="text-center mt-3">
@@ -450,13 +494,13 @@ function loadUserPetsList() {
 
 // Load user upcoming appointments
 function loadUserUpcomingAppointments() {
-    const container = document.getElementById('user-upcoming-list');
-    const today = new Date().toISOString().split('T')[0];
+    const container = document.getElementById("user-upcoming-list");
+    const today = new Date().toISOString().split("T")[0];
     const upcomingAppointments = AppState.appointments
-        .filter(apt => apt.date >= today)
+        .filter((apt) => apt.date >= today)
         .sort((a, b) => new Date(a.date) - new Date(b.date))
         .slice(0, 3);
-    
+
     if (upcomingAppointments.length === 0) {
         container.innerHTML = `
             <div class="text-center py-3">
@@ -468,8 +512,10 @@ function loadUserUpcomingAppointments() {
         `;
         return;
     }
-    
-    container.innerHTML = upcomingAppointments.map(appointment => `
+
+    container.innerHTML = upcomingAppointments
+        .map(
+            (appointment) => `
         <div class="appointment-card ${appointment.status} mb-3">
             <div class="d-flex justify-content-between align-items-start">
                 <div>
@@ -488,48 +534,58 @@ function loadUserUpcomingAppointments() {
                 </span>
             </div>
         </div>
-    `).join('');
+    `
+        )
+        .join("");
 }
 
 // Utility functions to get all data (for admin)
 function getAllClients() {
-    const usersList = JSON.parse(localStorage.getItem('bbc_clinic_users_list') || '[]');
+    const usersList = JSON.parse(
+        localStorage.getItem("bbc_clinic_users_list") || "[]"
+    );
     return usersList;
 }
 
 function getAllPets() {
     const usersList = getAllClients();
     const allPets = [];
-    
-    usersList.forEach(user => {
-        const userPets = JSON.parse(localStorage.getItem(`bbc_clinic_pets_${user.id}`) || '[]');
+
+    usersList.forEach((user) => {
+        const userPets = JSON.parse(
+            localStorage.getItem(`bbc_clinic_pets_${user.id}`) || "[]"
+        );
         allPets.push(...userPets);
     });
-    
+
     return allPets;
 }
 
 function getAllAppointments() {
     const usersList = getAllClients();
     const allAppointments = [];
-    
-    usersList.forEach(user => {
-        const userAppointments = JSON.parse(localStorage.getItem(`bbc_clinic_appointments_${user.id}`) || '[]');
+
+    usersList.forEach((user) => {
+        const userAppointments = JSON.parse(
+            localStorage.getItem(`bbc_clinic_appointments_${user.id}`) || "[]"
+        );
         allAppointments.push(...userAppointments);
     });
-    
+
     return allAppointments;
 }
 
 function getAllInvoices() {
     const usersList = getAllClients();
     const allInvoices = [];
-    
-    usersList.forEach(user => {
-        const userInvoices = JSON.parse(localStorage.getItem(`bbc_clinic_invoices_${user.id}`) || '[]');
+
+    usersList.forEach((user) => {
+        const userInvoices = JSON.parse(
+            localStorage.getItem(`bbc_clinic_invoices_${user.id}`) || "[]"
+        );
         allInvoices.push(...userInvoices);
     });
-    
+
     return allInvoices;
 }
 

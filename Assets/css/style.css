@@ -19,7 +19,7 @@
 
 /* Custom font */
 body {
-    font-family: 'Quicksand', sans-serif;
+    font-family: "Quicksand", sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
 }
@@ -50,17 +50,22 @@ body {
 }
 
 @keyframes bounce {
-    0%, 20%, 53%, 80%, 100% {
-        transform: translate3d(0,0,0);
+    0%,
+    20%,
+    53%,
+    80%,
+    100% {
+        transform: translate3d(0, 0, 0);
     }
-    40%, 43% {
-        transform: translate3d(0,-20px,0);
+    40%,
+    43% {
+        transform: translate3d(0, -20px, 0);
     }
     70% {
-        transform: translate3d(0,-10px,0);
+        transform: translate3d(0, -10px, 0);
     }
     90% {
-        transform: translate3d(0,-4px,0);
+        transform: translate3d(0, -4px, 0);
     }
 }
 
@@ -144,7 +149,11 @@ body {
 }
 
 .btn-success {
-    background: linear-gradient(135deg, var(--secondary-color) 0%, #059669 100%);
+    background: linear-gradient(
+        135deg,
+        var(--secondary-color) 0%,
+        #059669 100%
+    );
     box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
 }
 
@@ -208,7 +217,11 @@ body {
 
 /* Dashboard Cards */
 .stat-card {
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.9) 0%,
+        rgba(255, 255, 255, 0.8) 100%
+    );
     border-radius: var(--border-radius);
     padding: 2rem;
     text-align: center;
@@ -254,7 +267,11 @@ body {
 }
 
 .stat-icon.success {
-    background: linear-gradient(135deg, var(--secondary-color) 0%, #059669 100%);
+    background: linear-gradient(
+        135deg,
+        var(--secondary-color) 0%,
+        #059669 100%
+    );
 }
 
 .stat-icon.warning {
@@ -285,7 +302,11 @@ body {
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--cute-pink) 0%, var(--cute-blue) 100%);
+    background: linear-gradient(
+        135deg,
+        var(--cute-pink) 0%,
+        var(--cute-blue) 100%
+    );
     display: flex;
     align-items: center;
     justify-content: center;
@@ -307,7 +328,7 @@ body {
 }
 
 .appointment-card::before {
-    content: '';
+    content: "";
     position: absolute;
     top: 0;
     left: 0;
@@ -425,7 +446,7 @@ body {
 }
 
 .calendar-day.has-appointment::after {
-    content: '●';
+    content: "●";
     position: absolute;
     bottom: 4px;
     right: 4px;
@@ -522,18 +543,18 @@ body {
     .main-content {
         padding-top: 80px;
     }
-    
+
     .stat-card {
         padding: 1.5rem;
         margin-bottom: 1rem;
     }
-    
+
     .calendar-day {
         padding: 0.5rem;
         min-height: 40px;
         font-size: 0.9rem;
     }
-    
+
     .pet-card,
     .appointment-card,
     .health-record-card {
@@ -581,13 +602,18 @@ body {
 .cute-divider {
     width: 100%;
     height: 2px;
-    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+    background: linear-gradient(
+        90deg,
+        transparent,
+        var(--primary-color),
+        transparent
+    );
     margin: 2rem 0;
     position: relative;
 }
 
 .cute-divider::before {
-    content: '🐾';
+    content: "🐾";
     position: absolute;
     top: 50%;
     left: 50%;

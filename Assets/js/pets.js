@@ -2,9 +2,9 @@
 
 // Render pets page
 function renderPetsPage() {
-    const petsPage = document.getElementById('pets-page');
-    
-    if (AppState.userType === 'admin') {
+    const petsPage = document.getElementById("pets-page");
+
+    if (AppState.userType === "admin") {
         renderAdminPetsPage(petsPage);
     } else {
         renderUserPetsPage(petsPage);
@@ -14,17 +14,17 @@ function renderPetsPage() {
 // Render admin pets page
 function renderAdminPetsPage(container) {
     const allPets = getAllPets();
-    
+
     container.innerHTML = `
         <div class="row mb-4">
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h2 class="fw-bold text-primary mb-0">
+                        <h2 class="fw-bold text-white mb-0">
                             <i class="fas fa-paw me-2"></i>
                             Pet Management
                         </h2>
-                        <p class="text-muted">Manage all pets in the clinic</p>
+                        <p class="text-white">Manage all pets in the clinic</p>
                     </div>
                     <button class="btn btn-primary" onclick="showAddPetModal()">
                         <i class="fas fa-plus me-2"></i>Add New Pet
@@ -55,7 +55,12 @@ function renderAdminPetsPage(container) {
             <div class="col-md-3">
                 <select class="form-select" id="owner-filter" onchange="filterPets()">
                     <option value="">All Owners</option>
-                    ${getAllClients().map(client => `<option value="${client.id}">${client.name}</option>`).join('')}
+                    ${getAllClients()
+                        .map(
+                            (client) =>
+                                `<option value="${client.id}">${client.name}</option>`
+                        )
+                        .join("")}
                 </select>
             </div>
         </div>
@@ -74,11 +79,11 @@ function renderUserPetsPage(container) {
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h2 class="fw-bold text-primary mb-0">
+                        <h2 class="fw-bold text-white mb-0">
                             <i class="fas fa-paw me-2"></i>
                             My Pets
                         </h2>
-                        <p class="text-muted">Manage your furry family members</p>
+                        <p class="text-white">Manage your furry family members</p>
                     </div>
                     <button class="btn btn-primary" onclick="showAddPetModal()">
                         <i class="fas fa-plus me-2"></i>Add New Pet
@@ -92,9 +97,9 @@ function renderUserPetsPage(container) {
             ${renderPetsGrid(AppState.pets)}
         </div>
     `;
-    
+
     if (AppState.pets.length === 0) {
-        document.getElementById('pets-grid').innerHTML = `
+        document.getElementById("pets-grid").innerHTML = `
             <div class="col-12">
                 <div class="card text-center py-5">
                     <div class="card-body">
@@ -113,8 +118,12 @@ function renderUserPetsPage(container) {
 
 // Render pets grid
 function renderPetsGrid(pets) {
-    return pets.map(pet => `
-        <div class="col-lg-4 col-md-6 mb-4 pet-item" data-species="${pet.species}" data-owner="${pet.ownerId}" data-name="${pet.name.toLowerCase()}">
+    return pets
+        .map(
+            (pet) => `
+        <div class="col-lg-4 col-md-6 mb-4 pet-item" data-species="${
+            pet.species
+        }" data-owner="${pet.ownerId}" data-name="${pet.name.toLowerCase()}">
             <div class="card h-100">
                 <div class="card-body">
                     <div class="d-flex align-items-center mb-3">
@@ -130,17 +139,25 @@ function renderPetsGrid(pets) {
                                 <i class="fas fa-ellipsis-v"></i>
                             </button>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="#" onclick="viewPetDetails('${pet.id}')">
+                                <li><a class="dropdown-item" href="#" onclick="viewPetDetails('${
+                                    pet.id
+                                }')">
                                     <i class="fas fa-eye me-2"></i>View Details
                                 </a></li>
-                                <li><a class="dropdown-item" href="#" onclick="editPet('${pet.id}')">
+                                <li><a class="dropdown-item" href="#" onclick="editPet('${
+                                    pet.id
+                                }')">
                                     <i class="fas fa-edit me-2"></i>Edit
                                 </a></li>
-                                <li><a class="dropdown-item" href="#" onclick="bookAppointmentForPet('${pet.id}')">
+                                <li><a class="dropdown-item" href="#" onclick="bookAppointmentForPet('${
+                                    pet.id
+                                }')">
                                     <i class="fas fa-calendar-plus me-2"></i>Book Appointment
                                 </a></li>
                                 <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item text-danger" href="#" onclick="deletePet('${pet.id}')">
+                                <li><a class="dropdown-item text-danger" href="#" onclick="deletePet('${
+                                    pet.id
+                                }')">
                                     <i class="fas fa-trash me-2"></i>Delete
                                 </a></li>
                             </ul>
@@ -169,76 +186,101 @@ function renderPetsGrid(pets) {
                         </div>
                     </div>
                     
-                    ${pet.microchipId ? `
+                    ${
+                        pet.microchipId
+                            ? `
                         <div class="mb-3">
                             <p class="mb-1 small text-muted">Microchip ID</p>
                             <p class="mb-0 fw-semibold small">${pet.microchipId}</p>
                         </div>
-                    ` : ''}
+                    `
+                            : ""
+                    }
                     
-                    ${AppState.userType === 'admin' ? `
+                    ${
+                        AppState.userType === "admin"
+                            ? `
                         <div class="mb-3">
                             <p class="mb-1 small text-muted">Owner</p>
-                            <p class="mb-0 fw-semibold small">${getOwnerName(pet.ownerId)}</p>
+                            <p class="mb-0 fw-semibold small">${getOwnerName(
+                                pet.ownerId
+                            )}</p>
                         </div>
-                    ` : ''}
+                    `
+                            : ""
+                    }
                 </div>
                 
                 <div class="card-footer bg-transparent">
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <button class="btn btn-outline-primary btn-sm" onclick="viewPetDetails('${pet.id}')">
+                        <button class="btn btn-outline-primary btn-sm" onclick="viewPetDetails('${
+                            pet.id
+                        }')">
                             <i class="fas fa-eye me-1"></i>View
                         </button>
-                        <button class="btn btn-primary btn-sm" onclick="bookAppointmentForPet('${pet.id}')">
+                        <button class="btn btn-primary btn-sm" onclick="bookAppointmentForPet('${
+                            pet.id
+                        }')">
                             <i class="fas fa-calendar-plus me-1"></i>Book
                         </button>
                     </div>
                 </div>
             </div>
         </div>
-    `).join('');
+    `
+        )
+        .join("");
 }
 
 // Get pet icon based on species
 function getPetIcon(species) {
     switch (species.toLowerCase()) {
-        case 'dog': return 'dog';
-        case 'cat': return 'cat';
-        case 'bird': return 'dove';
-        case 'rabbit': return 'rabbit';
-        case 'hamster': return 'hamster';
-        default: return 'paw';
+        case "dog":
+            return "dog";
+        case "cat":
+            return "cat";
+        case "bird":
+            return "dove";
+        case "rabbit":
+            return "rabbit";
+        case "hamster":
+            return "hamster";
+        default:
+            return "paw";
     }
 }
 
 // Get owner name
 function getOwnerName(ownerId) {
     const clients = getAllClients();
-    const owner = clients.find(client => client.id === ownerId);
-    return owner ? owner.name : 'Unknown Owner';
+    const owner = clients.find((client) => client.id === ownerId);
+    return owner ? owner.name : "Unknown Owner";
 }
 
 // Filter pets
 function filterPets() {
-    const searchTerm = document.getElementById('pet-search').value.toLowerCase();
-    const speciesFilter = document.getElementById('species-filter')?.value || '';
-    const ownerFilter = document.getElementById('owner-filter')?.value || '';
-    
-    const petItems = document.querySelectorAll('.pet-item');
-    
-    petItems.forEach(item => {
+    const searchTerm = document
+        .getElementById("pet-search")
+        .value.toLowerCase();
+    const speciesFilter =
+        document.getElementById("species-filter")?.value || "";
+    const ownerFilter = document.getElementById("owner-filter")?.value || "";
+
+    const petItems = document.querySelectorAll(".pet-item");
+
+    petItems.forEach((item) => {
         const petName = item.dataset.name;
         const petSpecies = item.dataset.species;
         const petOwner = item.dataset.owner;
-        
+
         const matchesSearch = petName.includes(searchTerm);
         const matchesSpecies = !speciesFilter || petSpecies === speciesFilter;
         const matchesOwner = !ownerFilter || petOwner === ownerFilter;
-        
+
         if (matchesSearch && matchesSpecies && matchesOwner) {
-            item.style.display = 'block';
+            item.style.display = "block";
         } else {
-            item.style.display = 'none';
+            item.style.display = "none";
         }
     });
 }
@@ -314,15 +356,24 @@ function showAddPetModal() {
                                 </div>
                             </div>
                             
-                            ${AppState.userType === 'admin' ? `
+                            ${
+                                AppState.userType === "admin"
+                                    ? `
                                 <div class="mb-3">
                                     <label class="form-label">Owner *</label>
                                     <select class="form-select" id="pet-owner" required>
                                         <option value="">Select Owner</option>
-                                        ${getAllClients().map(client => `<option value="${client.id}">${client.name}</option>`).join('')}
+                                        ${getAllClients()
+                                            .map(
+                                                (client) =>
+                                                    `<option value="${client.id}">${client.name}</option>`
+                                            )
+                                            .join("")}
                                     </select>
                                 </div>
-                            ` : ''}
+                            `
+                                    : ""
+                            }
                             
                             <div class="mb-3">
                                 <label class="form-label">Emergency Contact</label>
@@ -345,96 +396,108 @@ function showAddPetModal() {
             </div>
         </div>
     `;
-    
+
     // Remove existing modal
-    const existingModal = document.getElementById('addPetModal');
+    const existingModal = document.getElementById("addPetModal");
     if (existingModal) {
         existingModal.remove();
     }
-    
+
     // Add modal to page
-    document.getElementById('modal-container').innerHTML = modalHtml;
-    
+    document.getElementById("modal-container").innerHTML = modalHtml;
+
     // Show modal
-    const modal = new bootstrap.Modal(document.getElementById('addPetModal'));
+    const modal = new bootstrap.Modal(document.getElementById("addPetModal"));
     modal.show();
 }
 
 // Handle add pet form submission
 function handleAddPet(event) {
     event.preventDefault();
-    
+
     const petData = {
-        id: generateId('pet'),
-        name: document.getElementById('pet-name').value.trim(),
-        species: document.getElementById('pet-species').value,
-        breed: document.getElementById('pet-breed').value.trim(),
-        age: parseInt(document.getElementById('pet-age').value),
-        weight: parseFloat(document.getElementById('pet-weight').value) || 0,
-        gender: document.getElementById('pet-gender').value,
-        color: document.getElementById('pet-color').value.trim(),
-        microchipId: document.getElementById('pet-microchip').value.trim(),
-        ownerId: AppState.userType === 'admin' ? document.getElementById('pet-owner').value : AppState.currentUser.id,
-        emergencyContact: document.getElementById('pet-emergency').value.trim(),
-        medicalNotes: document.getElementById('pet-notes').value.trim(),
-        createdAt: new Date().toISOString()
+        id: generateId("pet"),
+        name: document.getElementById("pet-name").value.trim(),
+        species: document.getElementById("pet-species").value,
+        breed: document.getElementById("pet-breed").value.trim(),
+        age: parseInt(document.getElementById("pet-age").value),
+        weight: parseFloat(document.getElementById("pet-weight").value) || 0,
+        gender: document.getElementById("pet-gender").value,
+        color: document.getElementById("pet-color").value.trim(),
+        microchipId: document.getElementById("pet-microchip").value.trim(),
+        ownerId:
+            AppState.userType === "admin"
+                ? document.getElementById("pet-owner").value
+                : AppState.currentUser.id,
+        emergencyContact: document.getElementById("pet-emergency").value.trim(),
+        medicalNotes: document.getElementById("pet-notes").value.trim(),
+        createdAt: new Date().toISOString(),
     };
-    
+
     // Validate required fields
     if (!petData.name || !petData.species || !petData.age) {
-        showAlert('Please fill in all required fields', 'danger');
+        showAlert("Please fill in all required fields", "danger");
         return;
     }
-    
-    if (AppState.userType === 'admin' && !petData.ownerId) {
-        showAlert('Please select an owner', 'danger');
+
+    if (AppState.userType === "admin" && !petData.ownerId) {
+        showAlert("Please select an owner", "danger");
         return;
     }
-    
+
     // Add pet to appropriate array
-    if (AppState.userType === 'admin') {
+    if (AppState.userType === "admin") {
         // Add to the owner's pets
-        const ownerPets = JSON.parse(localStorage.getItem(`bbc_clinic_pets_${petData.ownerId}`) || '[]');
+        const ownerPets = JSON.parse(
+            localStorage.getItem(`bbc_clinic_pets_${petData.ownerId}`) || "[]"
+        );
         ownerPets.push(petData);
-        localStorage.setItem(`bbc_clinic_pets_${petData.ownerId}`, JSON.stringify(ownerPets));
+        localStorage.setItem(
+            `bbc_clinic_pets_${petData.ownerId}`,
+            JSON.stringify(ownerPets)
+        );
     } else {
         // Add to current user's pets
         AppState.pets.push(petData);
         saveUserData();
     }
-    
+
     // Close modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('addPetModal'));
+    const modal = bootstrap.Modal.getInstance(
+        document.getElementById("addPetModal")
+    );
     modal.hide();
-    
+
     // Refresh pets page
     renderPetsPage();
-    
-    showAlert(`${petData.name} has been added successfully!`, 'success');
+
+    showAlert(`${petData.name} has been added successfully!`, "success");
 }
 
 // View pet details
 function viewPetDetails(petId) {
     let pet;
-    
-    if (AppState.userType === 'admin') {
-        pet = getAllPets().find(p => p.id === petId);
+
+    if (AppState.userType === "admin") {
+        pet = getAllPets().find((p) => p.id === petId);
     } else {
-        pet = AppState.pets.find(p => p.id === petId);
+        pet = AppState.pets.find((p) => p.id === petId);
     }
-    
+
     if (!pet) {
-        showAlert('Pet not found', 'danger');
+        showAlert("Pet not found", "danger");
         return;
     }
-    
+
     const modalHtml = `
         <div class="modal fade" id="petDetailsModal" tabindex="-1">
             <div class="modal-dialog modal-lg">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h5 class="modal-title">
-                            <i class="fas fa-${getPetIcon(pet.species)} text-primary me-2"></i>
+                            <i class="fas fa-${getPetIcon(
+                                pet.species
+                            )} text-primary me-2"></i>
                             ${pet.name} - Pet Details
                         </h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
@@ -449,31 +512,45 @@ function viewPetDetails(petId) {
                                     <div class="card-body">
                                         <div class="row mb-2">
                                             <div class="col-4 text-muted">Name:</div>
-                                            <div class="col-8 fw-semibold">${pet.name}</div>
+                                            <div class="col-8 fw-semibold">${
+                                                pet.name
+                                            }</div>
                                         </div>
                                         <div class="row mb-2">
                                             <div class="col-4 text-muted">Species:</div>
-                                            <div class="col-8">${pet.species}</div>
+                                            <div class="col-8">${
+                                                pet.species
+                                            }</div>
                                         </div>
                                         <div class="row mb-2">
                                             <div class="col-4 text-muted">Breed:</div>
-                                            <div class="col-8">${pet.breed || 'Not specified'}</div>
+                                            <div class="col-8">${
+                                                pet.breed || "Not specified"
+                                            }</div>
                                         </div>
                                         <div class="row mb-2">
                                             <div class="col-4 text-muted">Age:</div>
-                                            <div class="col-8">${pet.age} years</div>
+                                            <div class="col-8">${
+                                                pet.age
+                                            } years</div>
                                         </div>
                                         <div class="row mb-2">
                                             <div class="col-4 text-muted">Weight:</div>
-                                            <div class="col-8">${pet.weight} lbs</div>
+                                            <div class="col-8">${
+                                                pet.weight
+                                            } lbs</div>
                                         </div>
                                         <div class="row mb-2">
                                             <div class="col-4 text-muted">Gender:</div>
-                                            <div class="col-8">${pet.gender || 'Not specified'}</div>
+                                            <div class="col-8">${
+                                                pet.gender || "Not specified"
+                                            }</div>
                                         </div>
                                         <div class="row mb-2">
                                             <div class="col-4 text-muted">Color:</div>
-                                            <div class="col-8">${pet.color || 'Not specified'}</div>
+                                            <div class="col-8">${
+                                                pet.color || "Not specified"
+                                            }</div>
                                         </div>
                                     </div>
                                 </div>
@@ -484,34 +561,52 @@ function viewPetDetails(petId) {
                                         <h6 class="mb-0">Additional Information</h6>
                                     </div>
                                     <div class="card-body">
-                                        ${pet.microchipId ? `
+                                        ${
+                                            pet.microchipId
+                                                ? `
                                             <div class="row mb-2">
                                                 <div class="col-5 text-muted">Microchip ID:</div>
                                                 <div class="col-7 small">${pet.microchipId}</div>
                                             </div>
-                                        ` : ''}
-                                        ${AppState.userType === 'admin' ? `
+                                        `
+                                                : ""
+                                        }
+                                        ${
+                                            AppState.userType === "admin"
+                                                ? `
                                             <div class="row mb-2">
                                                 <div class="col-5 text-muted">Owner:</div>
-                                                <div class="col-7">${getOwnerName(pet.ownerId)}</div>
+                                                <div class="col-7">${getOwnerName(
+                                                    pet.ownerId
+                                                )}</div>
                                             </div>
-                                        ` : ''}
-                                        ${pet.emergencyContact ? `
+                                        `
+                                                : ""
+                                        }
+                                        ${
+                                            pet.emergencyContact
+                                                ? `
                                             <div class="row mb-2">
                                                 <div class="col-5 text-muted">Emergency Contact:</div>
                                                 <div class="col-7 small">${pet.emergencyContact}</div>
                                             </div>
-                                        ` : ''}
+                                        `
+                                                : ""
+                                        }
                                         <div class="row mb-2">
                                             <div class="col-5 text-muted">Added:</div>
-                                            <div class="col-7 small">${formatDate(pet.createdAt)}</div>
+                                            <div class="col-7 small">${formatDate(
+                                                pet.createdAt
+                                            )}</div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         
-                        ${pet.medicalNotes ? `
+                        ${
+                            pet.medicalNotes
+                                ? `
                             <div class="card">
                                 <div class="card-header">
                                     <h6 class="mb-0">Medical Notes</h6>
@@ -520,14 +615,20 @@ function viewPetDetails(petId) {
                                     <p class="mb-0">${pet.medicalNotes}</p>
                                 </div>
                             </div>
-                        ` : ''}
+                        `
+                                : ""
+                        }
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" onclick="editPet('${pet.id}')">
+                        <button type="button" class="btn btn-primary" onclick="editPet('${
+                            pet.id
+                        }')">
                             <i class="fas fa-edit me-2"></i>Edit Pet
                         </button>
-                        <button type="button" class="btn btn-success" onclick="bookAppointmentForPet('${pet.id}')">
+                        <button type="button" class="btn btn-success" onclick="bookAppointmentForPet('${
+                            pet.id
+                        }')">
                             <i class="fas fa-calendar-plus me-2"></i>Book Appointment
                         </button>
                     </div>
@@ -535,65 +636,76 @@ function viewPetDetails(petId) {
             </div>
         </div>
     `;
-    
+
     // Remove existing modal
-    const existingModal = document.getElementById('petDetailsModal');
+    const existingModal = document.getElementById("petDetailsModal");
     if (existingModal) {
         existingModal.remove();
     }
-    
+
     // Add modal to page
-    document.getElementById('modal-container').innerHTML = modalHtml;
-    
+    document.getElementById("modal-container").innerHTML = modalHtml;
+
     // Show modal
-    const modal = new bootstrap.Modal(document.getElementById('petDetailsModal'));
+    const modal = new bootstrap.Modal(
+        document.getElementById("petDetailsModal")
+    );
     modal.show();
 }
 
 // Edit pet
 function editPet(petId) {
     // Implementation similar to showAddPetModal but with pre-filled data
-    showAlert('Edit pet functionality will be implemented', 'info');
+    showAlert("Edit pet functionality will be implemented", "info");
 }
 
 // Delete pet
 function deletePet(petId) {
     let pet;
-    
-    if (AppState.userType === 'admin') {
-        pet = getAllPets().find(p => p.id === petId);
+
+    if (AppState.userType === "admin") {
+        pet = getAllPets().find((p) => p.id === petId);
     } else {
-        pet = AppState.pets.find(p => p.id === petId);
+        pet = AppState.pets.find((p) => p.id === petId);
     }
-    
+
     if (!pet) {
-        showAlert('Pet not found', 'danger');
+        showAlert("Pet not found", "danger");
         return;
     }
-    
-    if (confirm(`Are you sure you want to delete ${pet.name}? This action cannot be undone.`)) {
-        if (AppState.userType === 'admin') {
+
+    if (
+        confirm(
+            `Are you sure you want to delete ${pet.name}? This action cannot be undone.`
+        )
+    ) {
+        if (AppState.userType === "admin") {
             // Remove from owner's pets
-            const ownerPets = JSON.parse(localStorage.getItem(`bbc_clinic_pets_${pet.ownerId}`) || '[]');
-            const updatedPets = ownerPets.filter(p => p.id !== petId);
-            localStorage.setItem(`bbc_clinic_pets_${pet.ownerId}`, JSON.stringify(updatedPets));
+            const ownerPets = JSON.parse(
+                localStorage.getItem(`bbc_clinic_pets_${pet.ownerId}`) || "[]"
+            );
+            const updatedPets = ownerPets.filter((p) => p.id !== petId);
+            localStorage.setItem(
+                `bbc_clinic_pets_${pet.ownerId}`,
+                JSON.stringify(updatedPets)
+            );
         } else {
             // Remove from current user's pets
-            AppState.pets = AppState.pets.filter(p => p.id !== petId);
+            AppState.pets = AppState.pets.filter((p) => p.id !== petId);
             saveUserData();
         }
-        
+
         // Refresh pets page
         renderPetsPage();
-        
-        showAlert(`${pet.name} has been deleted`, 'success');
+
+        showAlert(`${pet.name} has been deleted`, "success");
     }
 }
 
 // Book appointment for pet
 function bookAppointmentForPet(petId) {
     // Store the pet ID for the appointment booking
-    sessionStorage.setItem('selectedPetId', petId);
+    sessionStorage.setItem("selectedPetId", petId);
     showAppointments();
 }
 

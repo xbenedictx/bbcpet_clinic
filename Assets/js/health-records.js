@@ -2,9 +2,9 @@
 
 // Render health records page
 function renderHealthRecordsPage() {
-    const healthRecordsPage = document.getElementById('health-records-page');
-    
-    if (AppState.userType === 'admin') {
+    const healthRecordsPage = document.getElementById("health-records-page");
+
+    if (AppState.userType === "admin") {
         renderAdminHealthRecordsPage(healthRecordsPage);
     } else {
         renderUserHealthRecordsPage(healthRecordsPage);
@@ -14,17 +14,17 @@ function renderHealthRecordsPage() {
 // Render admin health records page
 function renderAdminHealthRecordsPage(container) {
     const allHealthRecords = getAllHealthRecords();
-    
+
     container.innerHTML = `
         <div class="row mb-4">
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h2 class="fw-bold text-primary mb-0">
+                        <h2 class="fw-bold text-white mb-0">
                             <i class="fas fa-file-medical me-2"></i>
                             Health Records Management
                         </h2>
-                        <p class="text-muted">Manage electronic health records for all pets</p>
+                        <p class="text-white">Manage electronic health records for all pets</p>
                     </div>
                     <button class="btn btn-primary" onclick="showAddHealthRecordModal()">
                         <i class="fas fa-plus me-2"></i>Add Health Record
@@ -46,7 +46,12 @@ function renderAdminHealthRecordsPage(container) {
             <div class="col-md-3">
                 <select class="form-select" id="pet-filter" onchange="filterHealthRecords()">
                     <option value="">All Pets</option>
-                    ${getAllPets().map(pet => `<option value="${pet.id}">${pet.name} (${pet.species})</option>`).join('')}
+                    ${getAllPets()
+                        .map(
+                            (pet) =>
+                                `<option value="${pet.id}">${pet.name} (${pet.species})</option>`
+                        )
+                        .join("")}
                 </select>
             </div>
             <div class="col-md-3">
@@ -77,17 +82,19 @@ function renderUserHealthRecordsPage(container) {
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <h2 class="fw-bold text-primary mb-0">
+                        <h2 class="fw-bold text-white mb-0">
                             <i class="fas fa-file-medical me-2"></i>
                             My Pets' Health Records
                         </h2>
-                        <p class="text-muted">View your pets' medical history and health records</p>
+                        <p class="text-white">View your pets' medical history and health records</p>
                     </div>
                 </div>
             </div>
         </div>
         
-        ${AppState.pets.length === 0 ? `
+        ${
+            AppState.pets.length === 0
+                ? `
             <div class="row">
                 <div class="col-12">
                     <div class="card text-center py-5">
@@ -102,18 +109,24 @@ function renderUserHealthRecordsPage(container) {
                     </div>
                 </div>
             </div>
-        ` : `
+        `
+                : `
             <!-- Pet Selector -->
             <div class="row mb-4">
                 <div class="col-md-6">
                     <label class="form-label">Select Pet to View Records</label>
                     <select class="form-select" id="user-pet-selector" onchange="filterUserHealthRecords()">
                         <option value="">All Pets</option>
-                        ${AppState.pets.map(pet => `<option value="${pet.id}">${pet.name} (${pet.species})</option>`).join('')}
+                        ${AppState.pets
+                            .map(
+                                (pet) =>
+                                    `<option value="${pet.id}">${pet.name} (${pet.species})</option>`
+                            )
+                            .join("")}
                     </select>
                 </div>
                 <div class="col-md-6 d-flex align-items-end">
-                    <button class="btn btn-outline-primary" onclick="downloadHealthRecordsPDF()">
+                    <button class="btn btn-outline-primary text-white" onclick="downloadHealthRecordsPDF()">
                         <i class="fas fa-download me-2"></i>Download PDF Report
                     </button>
                 </div>
@@ -127,7 +140,8 @@ function renderUserHealthRecordsPage(container) {
                     </div>
                 </div>
             </div>
-        `}
+        `
+        }
     `;
 }
 
@@ -144,19 +158,26 @@ function renderHealthRecordsList(records) {
             </div>
         `;
     }
-    
+
     return records
         .sort((a, b) => new Date(b.date) - new Date(a.date))
-        .map(record => `
-            <div class="health-record-card mb-4 record-item" data-pet="${record.petId}" data-date="${record.date}">
+        .map(
+            (record) => `
+            <div class="health-record-card mb-4 record-item" data-pet="${
+                record.petId
+            }" data-date="${record.date}">
                 <div class="health-record-header">
                     <div>
                         <h5 class="fw-bold mb-1">${record.petName}</h5>
                         <p class="text-muted mb-0">${record.visitReason}</p>
                     </div>
                     <div class="text-end">
-                        <div class="record-date">${formatDate(record.date)}</div>
-                        <small class="text-muted">Dr. ${record.veterinarian}</small>
+                        <div class="record-date">${formatDate(
+                            record.date
+                        )}</div>
+                        <small class="text-muted">Dr. ${
+                            record.veterinarian
+                        }</small>
                     </div>
                 </div>
                 
@@ -167,7 +188,9 @@ function renderHealthRecordsList(records) {
                                 <h6 class="card-title mb-2 text-primary">
                                     <i class="fas fa-stethoscope me-1"></i>Diagnosis
                                 </h6>
-                                <p class="card-text mb-0">${record.diagnosis}</p>
+                                <p class="card-text mb-0">${
+                                    record.diagnosis
+                                }</p>
                             </div>
                         </div>
                     </div>
@@ -177,13 +200,17 @@ function renderHealthRecordsList(records) {
                                 <h6 class="card-title mb-2 text-success">
                                     <i class="fas fa-pills me-1"></i>Treatment
                                 </h6>
-                                <p class="card-text mb-0">${record.treatment}</p>
+                                <p class="card-text mb-0">${
+                                    record.treatment
+                                }</p>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                ${record.prescription ? `
+                ${
+                    record.prescription
+                        ? `
                     <div class="mb-3">
                         <div class="card bg-warning bg-opacity-10">
                             <div class="card-body py-2">
@@ -194,7 +221,9 @@ function renderHealthRecordsList(records) {
                             </div>
                         </div>
                     </div>
-                ` : ''}
+                `
+                        : ""
+                }
                 
                 <!-- Vital Signs -->
                 <div class="row mb-3">
@@ -218,23 +247,35 @@ function renderHealthRecordsList(records) {
                     </div>
                 </div>
                 
-                ${record.notes ? `
+                ${
+                    record.notes
+                        ? `
                     <div class="mb-3">
                         <h6 class="text-info mb-2">
                             <i class="fas fa-sticky-note me-1"></i>Additional Notes
                         </h6>
                         <p class="text-muted mb-0">${record.notes}</p>
                     </div>
-                ` : ''}
+                `
+                        : ""
+                }
                 
-                ${record.nextVisit ? `
+                ${
+                    record.nextVisit
+                        ? `
                     <div class="alert alert-info mb-0">
                         <i class="fas fa-calendar-plus me-2"></i>
-                        <strong>Next Recommended Visit:</strong> ${formatDate(record.nextVisit)}
+                        <strong>Next Recommended Visit:</strong> ${formatDate(
+                            record.nextVisit
+                        )}
                     </div>
-                ` : ''}
+                `
+                        : ""
+                }
                 
-                ${AppState.userType === 'admin' ? `
+                ${
+                    AppState.userType === "admin"
+                        ? `
                     <div class="d-flex justify-content-end mt-3">
                         <button class="btn btn-sm btn-outline-primary me-2" onclick="editHealthRecord('${record.id}')">
                             <i class="fas fa-edit me-1"></i>Edit
@@ -243,18 +284,22 @@ function renderHealthRecordsList(records) {
                             <i class="fas fa-trash me-1"></i>Delete
                         </button>
                     </div>
-                ` : ''}
+                `
+                        : ""
+                }
             </div>
-        `).join('');
+        `
+        )
+        .join("");
 }
 
 // Show add health record modal (admin only)
 function showAddHealthRecordModal() {
-    if (AppState.userType !== 'admin') {
-        showAlert('Access denied', 'danger');
+    if (AppState.userType !== "admin") {
+        showAlert("Access denied", "danger");
         return;
     }
-    
+
     const modalHtml = `
         <div class="modal fade" id="addHealthRecordModal" tabindex="-1">
             <div class="modal-dialog modal-xl">
@@ -273,12 +318,25 @@ function showAddHealthRecordModal() {
                                     <label class="form-label">Pet *</label>
                                     <select class="form-select" id="health-record-pet" required onchange="loadPetInfo()">
                                         <option value="">Select Pet</option>
-                                        ${getAllPets().map(pet => `<option value="${pet.id}">${pet.name} (${pet.species}) - ${getOwnerName(pet.ownerId)}</option>`).join('')}
+                                        ${getAllPets()
+                                            .map(
+                                                (pet) =>
+                                                    `<option value="${
+                                                        pet.id
+                                                    }">${pet.name} (${
+                                                        pet.species
+                                                    }) - ${getOwnerName(
+                                                        pet.ownerId
+                                                    )}</option>`
+                                            )
+                                            .join("")}
                                     </select>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Visit Date *</label>
-                                    <input type="date" class="form-control" id="health-record-date" value="${new Date().toISOString().split('T')[0]}" required>
+                                    <input type="date" class="form-control" id="health-record-date" value="${
+                                        new Date().toISOString().split("T")[0]
+                                    }" required>
                                 </div>
                             </div>
                             
@@ -364,193 +422,235 @@ function showAddHealthRecordModal() {
             </div>
         </div>
     `;
-    
+
     // Remove existing modal
-    const existingModal = document.getElementById('addHealthRecordModal');
+    const existingModal = document.getElementById("addHealthRecordModal");
     if (existingModal) {
         existingModal.remove();
     }
-    
+
     // Add modal to page
-    document.getElementById('modal-container').innerHTML = modalHtml;
-    
+    document.getElementById("modal-container").innerHTML = modalHtml;
+
     // Show modal
-    const modal = new bootstrap.Modal(document.getElementById('addHealthRecordModal'));
+    const modal = new bootstrap.Modal(
+        document.getElementById("addHealthRecordModal")
+    );
     modal.show();
 }
 
 // Load pet info when pet is selected
 function loadPetInfo() {
-    const petId = document.getElementById('health-record-pet').value;
+    const petId = document.getElementById("health-record-pet").value;
     if (!petId) return;
-    
-    const pet = getAllPets().find(p => p.id === petId);
+
+    const pet = getAllPets().find((p) => p.id === petId);
     if (pet) {
-        document.getElementById('health-record-weight').value = pet.weight || '';
+        document.getElementById("health-record-weight").value =
+            pet.weight || "";
     }
 }
 
 // Handle add health record form submission
 function handleAddHealthRecord(event) {
     event.preventDefault();
-    
-    const petId = document.getElementById('health-record-pet').value;
-    const selectedPet = getAllPets().find(p => p.id === petId);
-    
+
+    const petId = document.getElementById("health-record-pet").value;
+    const selectedPet = getAllPets().find((p) => p.id === petId);
+
     if (!selectedPet) {
-        showAlert('Please select a valid pet', 'danger');
+        showAlert("Please select a valid pet", "danger");
         return;
     }
-    
+
     const healthRecordData = {
-        id: generateId('hr'),
+        id: generateId("hr"),
         petId: petId,
         petName: selectedPet.name,
         ownerId: selectedPet.ownerId,
-        date: document.getElementById('health-record-date').value,
-        veterinarian: document.getElementById('health-record-vet').value.trim(),
-        visitReason: document.getElementById('health-record-reason').value,
-        diagnosis: document.getElementById('health-record-diagnosis').value.trim(),
-        treatment: document.getElementById('health-record-treatment').value.trim(),
-        prescription: document.getElementById('health-record-prescription').value.trim(),
-        weight: parseFloat(document.getElementById('health-record-weight').value) || 0,
-        temperature: parseFloat(document.getElementById('health-record-temperature').value) || 0,
-        heartRate: parseInt(document.getElementById('health-record-heartrate').value) || 0,
-        notes: document.getElementById('health-record-notes').value.trim(),
-        nextVisit: document.getElementById('health-record-next-visit').value,
-        createdAt: new Date().toISOString()
+        date: document.getElementById("health-record-date").value,
+        veterinarian: document.getElementById("health-record-vet").value.trim(),
+        visitReason: document.getElementById("health-record-reason").value,
+        diagnosis: document
+            .getElementById("health-record-diagnosis")
+            .value.trim(),
+        treatment: document
+            .getElementById("health-record-treatment")
+            .value.trim(),
+        prescription: document
+            .getElementById("health-record-prescription")
+            .value.trim(),
+        weight:
+            parseFloat(document.getElementById("health-record-weight").value) ||
+            0,
+        temperature:
+            parseFloat(
+                document.getElementById("health-record-temperature").value
+            ) || 0,
+        heartRate:
+            parseInt(
+                document.getElementById("health-record-heartrate").value
+            ) || 0,
+        notes: document.getElementById("health-record-notes").value.trim(),
+        nextVisit: document.getElementById("health-record-next-visit").value,
+        createdAt: new Date().toISOString(),
     };
-    
+
     // Add to the owner's health records
-    const ownerHealthRecords = JSON.parse(localStorage.getItem(`bbc_clinic_health_records_${selectedPet.ownerId}`) || '[]');
+    const ownerHealthRecords = JSON.parse(
+        localStorage.getItem(
+            `bbc_clinic_health_records_${selectedPet.ownerId}`
+        ) || "[]"
+    );
     ownerHealthRecords.push(healthRecordData);
-    localStorage.setItem(`bbc_clinic_health_records_${selectedPet.ownerId}`, JSON.stringify(ownerHealthRecords));
-    
+    localStorage.setItem(
+        `bbc_clinic_health_records_${selectedPet.ownerId}`,
+        JSON.stringify(ownerHealthRecords)
+    );
+
     // Close modal
-    const modal = bootstrap.Modal.getInstance(document.getElementById('addHealthRecordModal'));
+    const modal = bootstrap.Modal.getInstance(
+        document.getElementById("addHealthRecordModal")
+    );
     modal.hide();
-    
+
     // Refresh health records page
     renderHealthRecordsPage();
-    
-    showAlert(`Health record added for ${selectedPet.name}`, 'success');
+
+    showAlert(`Health record added for ${selectedPet.name}`, "success");
 }
 
 // Filter health records
 function filterHealthRecords() {
-    const searchTerm = document.getElementById('record-search')?.value.toLowerCase() || '';
-    const petFilter = document.getElementById('pet-filter')?.value || '';
-    const dateFilter = document.getElementById('date-filter')?.value || '';
-    
-    const recordItems = document.querySelectorAll('.record-item');
-    
-    recordItems.forEach(item => {
+    const searchTerm =
+        document.getElementById("record-search")?.value.toLowerCase() || "";
+    const petFilter = document.getElementById("pet-filter")?.value || "";
+    const dateFilter = document.getElementById("date-filter")?.value || "";
+
+    const recordItems = document.querySelectorAll(".record-item");
+
+    recordItems.forEach((item) => {
         const petId = item.dataset.pet;
         const recordDate = item.dataset.date;
         const textContent = item.textContent.toLowerCase();
-        
+
         const matchesSearch = textContent.includes(searchTerm);
         const matchesPet = !petFilter || petId === petFilter;
         const matchesDate = !dateFilter || recordDate === dateFilter;
-        
+
         if (matchesSearch && matchesPet && matchesDate) {
-            item.style.display = 'block';
+            item.style.display = "block";
         } else {
-            item.style.display = 'none';
+            item.style.display = "none";
         }
     });
 }
 
 // Filter user health records
 function filterUserHealthRecords() {
-    const petFilter = document.getElementById('user-pet-selector').value;
-    
-    const recordItems = document.querySelectorAll('.record-item');
-    
-    recordItems.forEach(item => {
+    const petFilter = document.getElementById("user-pet-selector").value;
+
+    const recordItems = document.querySelectorAll(".record-item");
+
+    recordItems.forEach((item) => {
         const petId = item.dataset.pet;
-        
+
         if (!petFilter || petId === petFilter) {
-            item.style.display = 'block';
+            item.style.display = "block";
         } else {
-            item.style.display = 'none';
+            item.style.display = "none";
         }
     });
 }
 
 // Clear health record filters
 function clearHealthRecordFilters() {
-    document.getElementById('record-search').value = '';
-    document.getElementById('pet-filter').value = '';
-    document.getElementById('date-filter').value = '';
+    document.getElementById("record-search").value = "";
+    document.getElementById("pet-filter").value = "";
+    document.getElementById("date-filter").value = "";
     filterHealthRecords();
 }
 
 // Download health records PDF
 function downloadHealthRecordsPDF() {
-    if (typeof jsPDF === 'undefined') {
-        showAlert('PDF library not loaded', 'danger');
+    if (typeof jsPDF === "undefined") {
+        showAlert("PDF library not loaded", "danger");
         return;
     }
-    
+
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
-    
+
     // Add title
     doc.setFontSize(20);
-    doc.text('BBC Veterinary Clinic', 20, 20);
+    doc.text("BBC Veterinary Clinic", 20, 20);
     doc.setFontSize(16);
-    doc.text('Health Records Report', 20, 30);
-    
+    doc.text("Health Records Report", 20, 30);
+
     // Add user info
     doc.setFontSize(12);
-    doc.text(`Owner: ${AppState.currentUser.firstName} ${AppState.currentUser.lastName}`, 20, 45);
+    doc.text(
+        `Owner: ${AppState.currentUser.firstName} ${AppState.currentUser.lastName}`,
+        20,
+        45
+    );
     doc.text(`Generated: ${new Date().toLocaleDateString()}`, 20, 55);
-    
+
     let yPosition = 70;
-    
+
     // Add records
     AppState.healthRecords.forEach((record, index) => {
         if (yPosition > 250) {
             doc.addPage();
             yPosition = 20;
         }
-        
+
         doc.setFontSize(14);
-        doc.text(`${record.petName} - ${formatDate(record.date)}`, 20, yPosition);
-        
+        doc.text(
+            `${record.petName} - ${formatDate(record.date)}`,
+            20,
+            yPosition
+        );
+
         yPosition += 10;
         doc.setFontSize(10);
         doc.text(`Visit Reason: ${record.visitReason}`, 25, yPosition);
-        
+
         yPosition += 8;
         doc.text(`Diagnosis: ${record.diagnosis}`, 25, yPosition);
-        
+
         yPosition += 8;
         doc.text(`Treatment: ${record.treatment}`, 25, yPosition);
-        
+
         if (record.prescription) {
             yPosition += 8;
             doc.text(`Prescription: ${record.prescription}`, 25, yPosition);
         }
-        
+
         yPosition += 15;
     });
-    
+
     // Save the PDF
-    doc.save(`BBC_Health_Records_${AppState.currentUser.lastName}_${new Date().toISOString().split('T')[0]}.pdf`);
-    showAlert('Health records PDF downloaded successfully!', 'success');
+    doc.save(
+        `BBC_Health_Records_${AppState.currentUser.lastName}_${
+            new Date().toISOString().split("T")[0]
+        }.pdf`
+    );
+    showAlert("Health records PDF downloaded successfully!", "success");
 }
 
 // Edit health record (admin only)
 function editHealthRecord(recordId) {
-    showAlert('Edit health record functionality will be implemented', 'info');
+    showAlert("Edit health record functionality will be implemented", "info");
 }
 
 // Delete health record (admin only)
 function deleteHealthRecord(recordId) {
-    if (confirm('Are you sure you want to delete this health record?')) {
-        showAlert('Delete health record functionality will be implemented', 'info');
+    if (confirm("Are you sure you want to delete this health record?")) {
+        showAlert(
+            "Delete health record functionality will be implemented",
+            "info"
+        );
     }
 }
 
@@ -558,12 +658,14 @@ function deleteHealthRecord(recordId) {
 function getAllHealthRecords() {
     const usersList = getAllClients();
     const allHealthRecords = [];
-    
-    usersList.forEach(user => {
-        const userHealthRecords = JSON.parse(localStorage.getItem(`bbc_clinic_health_records_${user.id}`) || '[]');
+
+    usersList.forEach((user) => {
+        const userHealthRecords = JSON.parse(
+            localStorage.getItem(`bbc_clinic_health_records_${user.id}`) || "[]"
+        );
         allHealthRecords.push(...userHealthRecords);
     });
-    
+
     return allHealthRecords;
 }
 
