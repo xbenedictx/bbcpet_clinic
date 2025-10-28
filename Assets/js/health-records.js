@@ -285,7 +285,13 @@ function renderHealthRecordsList(records) {
                         </button>
                     </div>
                 `
-                        : ""
+                        : `
+                    <div class="record-actions mt-3">
+                        <button class="btn btn-sm btn-outline-warning" onclick="editHealthRecord('${record.id}')">
+                            <i class="fas fa-edit me-1"></i>Edit
+                        </button>
+                    </div>
+                `
                 }
             </div>
         `
@@ -639,9 +645,216 @@ function downloadHealthRecordsPDF() {
     showAlert("Health records PDF downloaded successfully!", "success");
 }
 
-// Edit health record (admin only)
+// Show edit health record modal
 function editHealthRecord(recordId) {
-    showAlert("Edit health record functionality will be implemented", "info");
+    let record;
+    if (AppState.userType === "admin") {
+        record = getAllHealthRecords().find((rec) => rec.id === recordId);
+    } else {
+        record = AppState.healthRecords.find((rec) => rec.id === recordId);
+    }
+    if (!record) {
+        showAlert("Health record not found", "danger");
+        return;
+    }
+
+    const modalHtml = `
+        <div class="modal fade" id="editHealthRecordModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Health Record</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="edit-health-record-form">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Visit Date</label>
+                                    <input type="date" class="form-control" id="edit-health-record-date" value="${
+                                        record.date
+                                    }" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Visit Reason</label>
+                                    <input type="text" class="form-control" id="edit-health-record-reason" value="${
+                                        record.visitReason
+                                    }" required>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Diagnosis</label>
+                                <textarea class="form-control" id="edit-health-record-diagnosis" rows="2">${
+                                    record.diagnosis
+                                }</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Treatment</label>
+                                <textarea class="form-control" id="edit-health-record-treatment" rows="2">${
+                                    record.treatment
+                                }</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Prescription</label>
+                                <textarea class="form-control" id="edit-health-record-prescription" rows="2">${
+                                    record.prescription || ""
+                                }</textarea>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Weight (kg)</label>
+                                    <input type="number" class="form-control" id="edit-health-record-weight" step="0.1" value="${
+                                        record.weight
+                                    }">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Temperature (°F)</label>
+                                    <input type="number" class="form-control" id="edit-health-record-temperature" step="0.1" value="${
+                                        record.temperature
+                                    }">
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Heart Rate (bpm)</label>
+                                    <input type="number" class="form-control" id="edit-health-record-heartrate" value="${
+                                        record.heartRate
+                                    }">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Notes</label>
+                                <textarea class="form-control" id="edit-health-record-notes" rows="3">${
+                                    record.notes || ""
+                                }</textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Next Visit Date</label>
+                                <input type="date" class="form-control" id="edit-health-record-next-visit" value="${
+                                    record.nextVisit || ""
+                                }">
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="handleEditHealthRecord('${
+                            record.id
+                        }')">
+                            <i class="fas fa-save me-2"></i>Save Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Remove existing, add to DOM, show modal (same as other modals)
+    const existingModal = document.getElementById("editHealthRecordModal");
+    if (existingModal) existingModal.remove();
+    document.getElementById("modal-container").innerHTML += modalHtml;
+    const modal = new bootstrap.Modal(
+        document.getElementById("editHealthRecordModal")
+    );
+    modal.show();
+}
+
+// Handle edit submission
+function handleEditHealthRecord(recordId) {
+    const date = document.getElementById("edit-health-record-date").value;
+    const visitReason = document.getElementById(
+        "edit-health-record-reason"
+    ).value;
+    const diagnosis = document
+        .getElementById("edit-health-record-diagnosis")
+        .value.trim();
+    const treatment = document
+        .getElementById("edit-health-record-treatment")
+        .value.trim();
+    const prescription = document
+        .getElementById("edit-health-record-prescription")
+        .value.trim();
+    const weight =
+        parseFloat(
+            document.getElementById("edit-health-record-weight").value
+        ) || 0;
+    const temperature =
+        parseFloat(
+            document.getElementById("edit-health-record-temperature").value
+        ) || 0;
+    const heartRate =
+        parseInt(
+            document.getElementById("edit-health-record-heartrate").value
+        ) || 0;
+    const notes = document
+        .getElementById("edit-health-record-notes")
+        .value.trim();
+    const nextVisit = document.getElementById(
+        "edit-health-record-next-visit"
+    ).value;
+
+    if (!date || !visitReason) {
+        showAlert("Required fields must be filled", "danger");
+        return;
+    }
+
+    if (AppState.userType === "admin") {
+        const allRecords = getAllHealthRecords();
+        const record = allRecords.find((rec) => rec.id === recordId);
+        if (record) {
+            const ownerRecords = JSON.parse(
+                localStorage.getItem(
+                    `bbc_clinic_health_records_${record.ownerId}`
+                ) || "[]"
+            );
+            const index = ownerRecords.findIndex((rec) => rec.id === recordId);
+            if (index !== -1) {
+                ownerRecords[index] = {
+                    ...ownerRecords[index],
+                    date,
+                    visitReason,
+                    diagnosis,
+                    treatment,
+                    prescription,
+                    weight,
+                    temperature,
+                    heartRate,
+                    notes,
+                    nextVisit,
+                };
+                localStorage.setItem(
+                    `bbc_clinic_health_records_${record.ownerId}`,
+                    JSON.stringify(ownerRecords)
+                );
+            }
+        }
+    } else {
+        const index = AppState.healthRecords.findIndex(
+            (rec) => rec.id === recordId
+        );
+        if (index !== -1) {
+            AppState.healthRecords[index] = {
+                ...AppState.healthRecords[index],
+                date,
+                visitReason,
+                diagnosis,
+                treatment,
+                prescription,
+                weight,
+                temperature,
+                heartRate,
+                notes,
+                nextVisit,
+            };
+            saveUserData();
+        }
+    }
+
+    const modal = bootstrap.Modal.getInstance(
+        document.getElementById("editHealthRecordModal")
+    );
+    if (modal) modal.hide();
+    cleanupModals();
+    renderHealthRecordsPage();
+    showAlert("Health record updated successfully!", "success");
 }
 
 // Delete health record (admin only)
