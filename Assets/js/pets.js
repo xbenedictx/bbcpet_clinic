@@ -399,63 +399,143 @@ function showAddPetModal() {
 // Handle add pet form submission
 function handleAddPet(event) {
     event.preventDefault();
+    const form = event.target;
+    const petId = form.dataset.petId; // If present → edit mode
 
-    const petData = {
-        id: generateId("pet"),
-        name: document.getElementById("pet-name").value.trim(),
-        species: document.getElementById("pet-species").value,
-        breed: document.getElementById("pet-breed").value.trim(),
-        age: parseInt(document.getElementById("pet-age").value),
-        weight: parseFloat(document.getElementById("pet-weight").value) || 0,
-        gender: document.getElementById("pet-gender").value,
-        color: document.getElementById("pet-color").value.trim(),
-        ownerId:
-            AppState.userType === "admin"
-                ? document.getElementById("pet-owner").value
-                : AppState.currentUser.id,
-        emergencyContact: document.getElementById("pet-emergency").value.trim(),
-        medicalNotes: document.getElementById("pet-notes").value.trim(),
-        createdAt: new Date().toISOString(),
-    };
+    // Gather form data
+    const name = document.getElementById("pet-name").value.trim();
+    const species = document.getElementById("pet-species").value;
+    const breed = document.getElementById("pet-breed").value.trim();
+    const age = parseInt(document.getElementById("pet-age").value);
+    const weight = parseFloat(document.getElementById("pet-weight").value) || 0;
+    const gender = document.getElementById("pet-gender").value;
+    const color = document.getElementById("pet-color").value.trim();
+    const ownerId =
+        AppState.userType === "admin"
+            ? document.getElementById("pet-owner").value
+            : AppState.currentUser.id;
+    const emergencyContact = document
+        .getElementById("pet-emergency")
+        .value.trim();
+    const medicalNotes = document.getElementById("pet-notes").value.trim();
 
-    // Validate required fields
-    if (!petData.name || !petData.species || !petData.age) {
-        showAlert("Please fill in all required fields", "danger");
+    // === VALIDATION (must be first) ===
+    if (!name || !species || isNaN(age)) {
+        showAlert(
+            "Please fill in all required fields (Name, Species, Age)",
+            "danger"
+        );
         return;
     }
-
-    if (AppState.userType === "admin" && !petData.ownerId) {
+    if (AppState.userType === "admin" && !ownerId) {
         showAlert("Please select an owner", "danger");
         return;
     }
 
-    // Add pet to appropriate array
-    if (AppState.userType === "admin") {
-        // Add to the owner's pets
-        const ownerPets = JSON.parse(
-            localStorage.getItem(`bbc_clinic_pets_${petData.ownerId}`) || "[]"
-        );
-        ownerPets.push(petData);
-        localStorage.setItem(
-            `bbc_clinic_pets_${petData.ownerId}`,
-            JSON.stringify(ownerPets)
-        );
-    } else {
-        // Add to current user's pets
-        AppState.pets.push(petData);
-        saveUserData();
+    // === EDIT MODE ===
+    if (petId) {
+        let petToUpdate;
+        let storageKey;
+
+        if (AppState.userType === "admin") {
+            // Find pet across all owners
+            const allPets = getAllPets();
+            petToUpdate = allPets.find((p) => p.id === petId);
+            if (!petToUpdate) {
+                showAlert("Pet not found", "danger");
+                return;
+            }
+            storageKey = `bbc_clinic_pets_${petToUpdate.ownerId}`;
+        } else {
+            const index = AppState.pets.findIndex((p) => p.id === petId);
+            if (index === -1) {
+                showAlert("Pet not found", "danger");
+                return;
+            }
+            petToUpdate = AppState.pets[index];
+            storageKey = `bbc_clinic_pets_${AppState.currentUser.id}`;
+        }
+
+        // Update only changed fields (preserve original id, createdAt, etc.)
+        const updatedPet = {
+            ...petToUpdate,
+            name,
+            species,
+            breed,
+            age,
+            weight,
+            gender,
+            color,
+            emergencyContact,
+            medicalNotes,
+            // ownerId should NOT change unless admin explicitly allows
+            updatedAt: new Date().toISOString(),
+        };
+
+        if (AppState.userType === "admin") {
+            const ownerPets = JSON.parse(
+                localStorage.getItem(storageKey) || "[]"
+            );
+            const index = ownerPets.findIndex((p) => p.id === petId);
+            if (index !== -1) {
+                ownerPets[index] = updatedPet;
+                localStorage.setItem(storageKey, JSON.stringify(ownerPets));
+            }
+        } else {
+            AppState.pets = AppState.pets.map((p) =>
+                p.id === petId ? updatedPet : p
+            );
+            saveUserData();
+        }
+
+        showAlert(`${name} has been updated successfully!`, "success");
+    }
+    // === ADD MODE ===
+    else {
+        const newPet = {
+            id: generateId("pet"),
+            name,
+            species,
+            breed,
+            age,
+            weight,
+            gender,
+            color,
+            ownerId,
+            emergencyContact,
+            medicalNotes,
+            createdAt: new Date().toISOString(),
+        };
+
+        if (AppState.userType === "admin") {
+            const ownerPets = JSON.parse(
+                localStorage.getItem(`bbc_clinic_pets_${ownerId}`) || "[]"
+            );
+            ownerPets.push(newPet);
+            localStorage.setItem(
+                `bbc_clinic_pets_${ownerId}`,
+                JSON.stringify(ownerPets)
+            );
+        } else {
+            AppState.pets.push(newPet);
+            saveUserData();
+        }
+
+        showAlert(`${name} has been added successfully!`, "success");
     }
 
-    // Close modal
+    // === CLOSE MODAL & REFRESH (once) ===
     const modal = bootstrap.Modal.getInstance(
         document.getElementById("addPetModal")
     );
     modal.hide();
 
-    // Refresh pets page
-    renderPetsPage();
+    // Reset form and remove edit flag
+    form.reset();
+    delete form.dataset.petId;
 
-    showAlert(`${petData.name} has been added successfully!`, "success");
+    // Refresh page
+    renderPetsPage();
 }
 
 // View pet details
@@ -610,8 +690,39 @@ function viewPetDetails(petId) {
 
 // Edit pet
 function editPet(petId) {
-    // Implementation similar to showAddPetModal but with pre-filled data
-    showAlert("Edit pet functionality will be implemented", "info");
+    let pet;
+    if (AppState.userType === "admin") {
+        pet = getAllPets().find((p) => p.id === petId);
+    } else {
+        pet = AppState.pets.find((p) => p.id === petId);
+    }
+
+    if (!pet) {
+        showAlert("Pet not found", "danger");
+        return;
+    }
+
+    // Show add modal but prefill and change to edit mode
+    showAddPetModal(); // Call existing modal function
+
+    // Prefill form (after modal is shown)
+    setTimeout(() => {
+        document.getElementById("pet-name").value = pet.name;
+        document.getElementById("pet-species").value = pet.species;
+        document.getElementById("pet-breed").value = pet.breed;
+        document.getElementById("pet-age").value = pet.age;
+        document.getElementById("pet-weight").value = pet.weight;
+        document.getElementById("pet-color").value = pet.color;
+        document.getElementById("pet-gender").value = pet.gender;
+        // Change modal title and button
+        document.querySelector("#addPetModal .modal-title").textContent =
+            "Edit Pet";
+        document.querySelector("#addPetModal .btn-success").textContent =
+            "Save Changes";
+        // Store petId in form for update
+        const form = document.getElementById("add-pet-form");
+        form.dataset.petId = petId;
+    }, 100);
 }
 
 // Delete pet
