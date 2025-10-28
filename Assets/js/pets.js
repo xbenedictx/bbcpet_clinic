@@ -187,17 +187,6 @@ function renderPetsGrid(pets) {
                     </div>
                     
                     ${
-                        pet.microchipId
-                            ? `
-                        <div class="mb-3">
-                            <p class="mb-1 small text-muted">Microchip ID</p>
-                            <p class="mb-0 fw-semibold small">${pet.microchipId}</p>
-                        </div>
-                    `
-                            : ""
-                    }
-                    
-                    ${
                         AppState.userType === "admin"
                             ? `
                         <div class="mb-3">
@@ -350,10 +339,6 @@ function showAddPetModal() {
                                     <label class="form-label">Color</label>
                                     <input type="text" class="form-control" id="pet-color">
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Microchip ID</label>
-                                    <input type="text" class="form-control" id="pet-microchip">
-                                </div>
                             </div>
                             
                             ${
@@ -424,7 +409,6 @@ function handleAddPet(event) {
         weight: parseFloat(document.getElementById("pet-weight").value) || 0,
         gender: document.getElementById("pet-gender").value,
         color: document.getElementById("pet-color").value.trim(),
-        microchipId: document.getElementById("pet-microchip").value.trim(),
         ownerId:
             AppState.userType === "admin"
                 ? document.getElementById("pet-owner").value
@@ -490,152 +474,123 @@ function viewPetDetails(petId) {
     }
 
     const modalHtml = `
-        <div class="modal fade" id="petDetailsModal" tabindex="-1">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">
-                            <i class="fas fa-${getPetIcon(
-                                pet.species
-                            )} text-primary me-2"></i>
-                            ${pet.name} - Pet Details
-                        </h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="card mb-3">
-                                    <div class="card-header">
-                                        <h6 class="mb-0">Basic Information</h6>
-                                    </div>
-                                    <div class="card-body">
-                                        <div class="row mb-2">
-                                            <div class="col-4 text-muted">Name:</div>
-                                            <div class="col-8 fw-semibold">${
-                                                pet.name
-                                            }</div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-4 text-muted">Species:</div>
-                                            <div class="col-8">${
-                                                pet.species
-                                            }</div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-4 text-muted">Breed:</div>
-                                            <div class="col-8">${
-                                                pet.breed || "Not specified"
-                                            }</div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-4 text-muted">Age:</div>
-                                            <div class="col-8">${
-                                                pet.age
-                                            } years</div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-4 text-muted">Weight:</div>
-                                            <div class="col-8">${
-                                                pet.weight
-                                            } lbs</div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-4 text-muted">Gender:</div>
-                                            <div class="col-8">${
-                                                pet.gender || "Not specified"
-                                            }</div>
-                                        </div>
-                                        <div class="row mb-2">
-                                            <div class="col-4 text-muted">Color:</div>
-                                            <div class="col-8">${
-                                                pet.color || "Not specified"
-                                            }</div>
-                                        </div>
-                                    </div>
+    <div class="modal fade" id="petDetailsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">${pet.name} - ${pet.breed}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Basic Information</h6>
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="card mb-3">
-                                    <div class="card-header">
-                                        <h6 class="mb-0">Additional Information</h6>
+                                <div class="card-body">
+                                    <div class="row mb-2">
+                                        <div class="col-5 text-muted">Species:</div>
+                                        <div class="col-7">${pet.species}</div>
                                     </div>
-                                    <div class="card-body">
-                                        ${
-                                            pet.microchipId
-                                                ? `
-                                            <div class="row mb-2">
-                                                <div class="col-5 text-muted">Microchip ID:</div>
-                                                <div class="col-7 small">${pet.microchipId}</div>
-                                            </div>
-                                        `
-                                                : ""
-                                        }
-                                        ${
-                                            AppState.userType === "admin"
-                                                ? `
-                                            <div class="row mb-2">
-                                                <div class="col-5 text-muted">Owner:</div>
-                                                <div class="col-7">${getOwnerName(
-                                                    pet.ownerId
-                                                )}</div>
-                                            </div>
-                                        `
-                                                : ""
-                                        }
-                                        ${
-                                            pet.emergencyContact
-                                                ? `
-                                            <div class="row mb-2">
-                                                <div class="col-5 text-muted">Emergency Contact:</div>
-                                                <div class="col-7 small">${pet.emergencyContact}</div>
-                                            </div>
-                                        `
-                                                : ""
-                                        }
-                                        <div class="row mb-2">
-                                            <div class="col-5 text-muted">Added:</div>
-                                            <div class="col-7 small">${formatDate(
-                                                pet.createdAt
-                                            )}</div>
-                                        </div>
+                                    <div class="row mb-2">
+                                        <div class="col-5 text-muted">Breed:</div>
+                                        <div class="col-7">${pet.breed}</div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-5 text-muted">Age:</div>
+                                        <div class="col-7">${
+                                            pet.age
+                                        } years</div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-5 text-muted">Gender:</div>
+                                        <div class="col-7">${pet.gender}</div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-5 text-muted">Weight:</div>
+                                        <div class="col-7">${
+                                            pet.weight
+                                        } lbs</div>
+                                    </div>
+                                    <div class="row mb-2">
+                                        <div class="col-5 text-muted">Color:</div>
+                                        <div class="col-7">${pet.color}</div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        
-                        ${
-                            pet.medicalNotes
-                                ? `
-                            <div class="card">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
                                 <div class="card-header">
-                                    <h6 class="mb-0">Medical Notes</h6>
+                                    <h6 class="mb-0">Additional Information</h6>
                                 </div>
                                 <div class="card-body">
-                                    <p class="mb-0">${pet.medicalNotes}</p>
+                                    ${
+                                        AppState.userType === "admin"
+                                            ? `
+                                        <div class="row mb-2">
+                                            <div class="col-5 text-muted">Owner:</div>
+                                            <div class="col-7">${getOwnerName(
+                                                pet.ownerId
+                                            )}</div>
+                                        </div>
+                                    `
+                                            : ""
+                                    }
+                                    ${
+                                        pet.emergencyContact
+                                            ? `
+                                        <div class="row mb-2">
+                                            <div class="col-5 text-muted">Emergency Contact:</div>
+                                            <div class="col-7 small">${pet.emergencyContact}</div>
+                                        </div>
+                                    `
+                                            : ""
+                                    }
+                                    <div class="row mb-2">
+                                        <div class="col-5 text-muted">Added:</div>
+                                        <div class="col-7 small">${formatDate(
+                                            pet.createdAt
+                                        )}</div>
+                                    </div>
                                 </div>
                             </div>
-                        `
-                                : ""
-                        }
+                        </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" onclick="editPet('${
-                            pet.id
-                        }')">
-                            <i class="fas fa-edit me-2"></i>Edit Pet
-                        </button>
-                        <button type="button" class="btn btn-success" onclick="bookAppointmentForPet('${
-                            pet.id
-                        }')">
-                            <i class="fas fa-calendar-plus me-2"></i>Book Appointment
-                        </button>
-                    </div>
+                    
+                    ${
+                        pet.medicalNotes
+                            ? `
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="mb-0">Medical Notes</h6>
+                            </div>
+                            <div class="card-body">
+                                <p class="mb-0">${pet.medicalNotes}</p>
+                            </div>
+                        </div>
+                    `
+                            : ""
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" onclick="editPet('${
+                        pet.id
+                    }')">
+                        <i class="fas fa-edit me-2"></i>Edit Pet
+                    </button>
+                    <button type="button" class="btn btn-success" onclick="bookAppointmentForPet('${
+                        pet.id
+                    }')">
+                        <i class="fas fa-calendar-plus me-2"></i>Book Appointment
+                    </button>
                 </div>
             </div>
         </div>
-    `;
+    </div>
+`;
 
     // Remove existing modal
     const existingModal = document.getElementById("petDetailsModal");

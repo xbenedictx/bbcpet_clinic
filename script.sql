@@ -83,7 +83,6 @@ CREATE TABLE pets (
     color VARCHAR(50),
     gender ENUM('Male', 'Female', 'Unknown') DEFAULT 'Unknown',
     spayed_neutered BOOLEAN DEFAULT NULL,
-    microchip_id VARCHAR(50),
     insurance_info TEXT,
     special_needs TEXT,
     behavioral_notes TEXT,
@@ -96,7 +95,6 @@ CREATE TABLE pets (
     FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE,
     INDEX idx_owner_id (owner_id),
     INDEX idx_species (species),
-    INDEX idx_microchip (microchip_id),
     INDEX idx_active (is_active),
     INDEX idx_name (name)
 );
@@ -563,7 +561,6 @@ INSERT INTO services (service_name, service_code, category, base_price) VALUES
 ('X-Ray - Single View', 'XRAY-1', 'Radiology', 120.00),
 ('X-Ray - Multiple Views', 'XRAY-MULT', 'Radiology', 180.00),
 ('Dental Cleaning', 'DENT-CLEAN', 'Dental', 200.00),
-('Microchip Implantation', 'MICRO-CHIP', 'Surgery', 45.00),
 ('Spay - Dog (Small)', 'SPAY-DOG-S', 'Surgery', 350.00),
 ('Spay - Dog (Large)', 'SPAY-DOG-L', 'Surgery', 450.00),
 ('Neuter - Dog', 'NEUTER-DOG', 'Surgery', 275.00),
@@ -813,7 +810,6 @@ SELECT
     (SELECT COUNT(*) FROM health_records WHERE pet_id = p.id) as total_records,
     (SELECT MAX(visit_date) FROM health_records WHERE pet_id = p.id) as last_visit_date,
     (SELECT MAX(next_due_date) FROM vaccinations WHERE pet_id = p.id) as next_vaccine_due,
-    p.microchip_id,
     p.created_at
 FROM pets p
 LEFT JOIN users u ON p.owner_id = u.id
