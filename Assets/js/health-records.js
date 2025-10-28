@@ -236,7 +236,7 @@ function renderHealthRecordsList(records) {
                     <div class="col-md-4">
                         <div class="text-center p-2 border rounded">
                             <div class="text-muted small">Temperature</div>
-                            <div class="fw-bold">${record.temperature}°F</div>
+                            <div class="fw-bold">${record.temperature}°C</div>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -389,7 +389,7 @@ function showAddHealthRecordModal() {
                                             <input type="number" class="form-control" id="health-record-weight" step="0.1" min="0">
                                         </div>
                                         <div class="col-md-4 mb-3">
-                                            <label class="form-label">Temperature (°F)</label>
+                                            <label class="form-label">Temperature (°C)</label>
                                             <input type="number" class="form-control" id="health-record-temperature" step="0.1" min="90" max="110">
                                         </div>
                                         <div class="col-md-4 mb-3">
