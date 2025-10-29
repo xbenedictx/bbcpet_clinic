@@ -115,6 +115,12 @@ function renderAdminBillingPage(container) {
         </div>
     `;
 
+    document.getElementById("invoices-list").addEventListener("click", (e) => {
+        if (e.target.classList.contains("mark-paid-btn")) {
+            markInvoicePaid(e.target.dataset.invoiceId);
+        }
+    });
+
     updateBillingStats();
 }
 
@@ -294,9 +300,7 @@ function renderInvoicesList(invoices) {
                         AppState.userType === "admin" &&
                         invoice.status === "pending"
                             ? `
-                        <button class="btn btn-success btn-sm" onclick="markInvoicePaid('${invoice.id}')">
-                            <i class="fas fa-check me-1"></i>Mark Paid
-                        </button>
+                                <button class="btn btn-sm btn-success mark-paid-btn" data-invoice-id="${invoice.id}">Mark Paid</button>
                     `
                             : ""
                     }
