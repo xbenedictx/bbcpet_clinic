@@ -359,15 +359,6 @@ function showCreateInvoiceModal() {
                                         new Date().toISOString().split("T")[0]
                                     }" required>
                                 </div>
-                                <div class="col-md-6 mb-3">
-                                    <label class="form-label">Payment Method *</label>
-                                    <select class="form-select" id="invoice-payment" required>
-                                        <option value="">Select Payment Method</option>
-                                        <option value="cash">Cash</option>
-                                        <option value="card">Credit/Debit Card</option>
-                                        <option value="check">Check</option>
-                                    </select>
-                                </div>
                             </div>
                             
                             <!-- Services Section -->
