@@ -308,6 +308,40 @@ function renderInvoicesList(invoices) {
         .join("");
 }
 
+function downloadInvoicePDF(invoiceId) {
+    const invoice =
+        AppState.invoices.find((inv) => inv.id === invoiceId) ||
+        getAllInvoices().find((inv) => inv.id === invoiceId);
+    if (!invoice) return;
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text(`Invoice ${invoice.number}`, 20, 20);
+    doc.setFontSize(12);
+    doc.text(`Client: ${invoice.clientName}`, 20, 30);
+    doc.text(`Pet: ${invoice.petName}`, 20, 37);
+    doc.text(`Date: ${formatDate(invoice.date)}`, 20, 44);
+
+    let y = 55;
+    invoice.services.forEach((service) => {
+        doc.text(
+            `${service.description} x ${service.quantity}: ₱${(
+                service.quantity * service.price
+            ).toFixed(2)}`,
+            20,
+            y
+        );
+        y += 10;
+    });
+
+    doc.text(`Total: ₱${invoice.total.toFixed(2)}`, 20, y + 10);
+    doc.save(`invoice_${invoice.number}.pdf`);
+    showAlert("Invoice PDF downloaded!", "success");
+}
+
+window.downloadInvoicePDF = downloadInvoicePDF;
 function viewInvoiceDetails(invoiceId) {
     let invoice;
     if (AppState.userType === "admin") {
@@ -384,6 +418,11 @@ function viewInvoiceDetails(invoiceId) {
                         `
                                 : ""
                         }
+                        <button type="button" class="btn btn-info" onclick="downloadInvoicePDF('${
+                            invoice.id
+                        }')">
+                            <i class="fas fa-download me-2"></i>Download PDF
+                        </button>
                     </div>
                 </div>
             </div>
