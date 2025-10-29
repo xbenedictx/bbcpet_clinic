@@ -233,10 +233,6 @@ function renderInvoicesList(invoices) {
                             <i class="fas fa-calendar me-1"></i>
                             Date: ${formatDate(invoice.date)}
                         </p>
-                        <p class="text-muted mb-1 small">
-                            <i class="fas fa-credit-card me-1"></i>
-                            Payment: ${capitalizeFirst(invoice.paymentMethod)}
-                        </p>
                     </div>
                     <div class="col-md-6">
                         <p class="text-muted mb-1 small">Subtotal: ₱${invoice.subtotal.toFixed(
@@ -594,7 +590,6 @@ function handleCreateInvoice(event) {
     const clientId = document.getElementById("invoice-client").value;
     const petId = document.getElementById("invoice-pet").value;
     const date = document.getElementById("invoice-date").value;
-    const paymentMethod = document.getElementById("invoice-payment").value;
 
     // Get client and pet info
     const client = getAllClients().find((c) => c.id === clientId);
@@ -651,7 +646,6 @@ function handleCreateInvoice(event) {
         petId: petId,
         petName: pet.name,
         date: date,
-        paymentMethod: paymentMethod,
         services: services,
         subtotal: subtotal,
         tax: 0,

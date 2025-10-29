@@ -428,7 +428,6 @@ CREATE TABLE payments (
     invoice_id INT NOT NULL,
     payment_date DATE NOT NULL,
     amount DECIMAL(10,2) NOT NULL,
-    payment_method ENUM('cash', 'check', 'credit_card', 'debit_card', 'bank_transfer', 'other') NOT NULL,
     reference_number VARCHAR(100),
     check_number VARCHAR(50),
     card_last_four VARCHAR(4),
@@ -441,7 +440,6 @@ CREATE TABLE payments (
     FOREIGN KEY (processed_by) REFERENCES users(id) ON SET NULL,
     INDEX idx_invoice_id (invoice_id),
     INDEX idx_payment_date (payment_date),
-    INDEX idx_payment_method (payment_method)
 );
 
 -- =====================================================
