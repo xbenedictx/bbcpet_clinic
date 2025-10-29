@@ -693,6 +693,7 @@ function handleCreateInvoice(event) {
     modal.hide();
 
     // Refresh the page and show confirmation
+    updateBillingStats();
     renderBillingPage();
     showAlert("Invoice created successfully!", "success");
 }
@@ -769,6 +770,7 @@ function markInvoicePaid(invoiceId) {
     }
 
     showAlert("Invoice not found", "danger");
+    updateBillingStats();
 }
 
 window.markInvoicePaid = markInvoicePaid;
