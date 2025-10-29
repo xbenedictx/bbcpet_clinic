@@ -129,7 +129,7 @@ CREATE TABLE pet_media (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     FOREIGN KEY (pet_id) REFERENCES pets(id) ON DELETE CASCADE,
-    FOREIGN KEY (uploaded_by) REFERENCES users(id) ON SET NULL,
+    FOREIGN KEY (uploaded_by) REFERENCES users(id) ON DELETE SET NULL,  -- Fixed: was "ON SET NULL"
     INDEX idx_pet_id (pet_id),
     INDEX idx_file_type (file_type)
 );
@@ -178,12 +178,12 @@ CREATE TABLE appointments (
     created_by INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    
+        
     FOREIGN KEY (pet_id) REFERENCES pets(id) ON DELETE CASCADE,
     FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (veterinarian_id) REFERENCES users(id) ON SET NULL,
-    FOREIGN KEY (appointment_type_id) REFERENCES appointment_types(id) ON SET NULL,
-    FOREIGN KEY (created_by) REFERENCES users(id) ON SET NULL,
+    FOREIGN KEY (veterinarian_id) REFERENCES users(id) ON DELETE SET NULL,  -- Fixed: was "ON SET NULL"
+    FOREIGN KEY (appointment_type_id) REFERENCES appointment_types(id) ON DELETE SET NULL,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
     
     INDEX idx_pet_id (pet_id),
     INDEX idx_owner_id (owner_id),
@@ -237,9 +237,9 @@ CREATE TABLE health_records (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     FOREIGN KEY (pet_id) REFERENCES pets(id) ON DELETE CASCADE,
-    FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON SET NULL,
+    FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE SET NULL,
     FOREIGN KEY (veterinarian_id) REFERENCES users(id),
-    FOREIGN KEY (created_by) REFERENCES users(id) ON SET NULL,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
     
     INDEX idx_pet_id (pet_id),
     INDEX idx_appointment_id (appointment_id),
@@ -264,7 +264,7 @@ CREATE TABLE vital_signs (
     recorded_by INT,
     
     FOREIGN KEY (health_record_id) REFERENCES health_records(id) ON DELETE CASCADE,
-    FOREIGN KEY (recorded_by) REFERENCES users(id) ON SET NULL,
+    FOREIGN KEY (recorded_by) REFERENCES users(id) ON DELETE SET NULL,
     INDEX idx_health_record_id (health_record_id)
 );
 
@@ -312,7 +312,7 @@ CREATE TABLE vaccinations (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     FOREIGN KEY (pet_id) REFERENCES pets(id) ON DELETE CASCADE,
-    FOREIGN KEY (health_record_id) REFERENCES health_records(id) ON SET NULL,
+    FOREIGN KEY (health_record_id) REFERENCES health_records(id) ON DELETE SET NULL,
     FOREIGN KEY (administered_by) REFERENCES users(id),
     INDEX idx_pet_id (pet_id),
     INDEX idx_administered_date (administered_date),
@@ -338,8 +338,8 @@ CREATE TABLE lab_results (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     FOREIGN KEY (health_record_id) REFERENCES health_records(id) ON DELETE CASCADE,
-    FOREIGN KEY (ordered_by) REFERENCES users(id) ON SET NULL,
-    FOREIGN KEY (reviewed_by) REFERENCES users(id) ON SET NULL,
+    FOREIGN KEY (ordered_by) REFERENCES users(id) ON DELETE SET NULL,
+    FOREIGN KEY (reviewed_by) REFERENCES users(id) ON DELETE SET NULL,
     INDEX idx_health_record_id (health_record_id),
     INDEX idx_test_date (test_date),
     INDEX idx_test_name (test_name)
@@ -389,9 +389,9 @@ CREATE TABLE invoices (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
     FOREIGN KEY (client_id) REFERENCES users(id) ON DELETE CASCADE,
-    FOREIGN KEY (pet_id) REFERENCES pets(id) ON SET NULL,
-    FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON SET NULL,
-    FOREIGN KEY (created_by) REFERENCES users(id) ON SET NULL,
+    FOREIGN KEY (pet_id) REFERENCES pets(id) ON DELETE SET NULL,
+    FOREIGN KEY (appointment_id) REFERENCES appointments(id) ON DELETE SET NULL,
+    FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
     
     INDEX idx_invoice_number (invoice_number),
     INDEX idx_client_id (client_id),
@@ -413,7 +413,7 @@ CREATE TABLE invoice_items (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE,
-    FOREIGN KEY (service_id) REFERENCES services(id) ON SET NULL,
+    FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE SET NULL,
     INDEX idx_invoice_id (invoice_id)
 );
 
@@ -433,9 +433,9 @@ CREATE TABLE payments (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE,
-    FOREIGN KEY (processed_by) REFERENCES users(id) ON SET NULL,
+    FOREIGN KEY (processed_by) REFERENCES users(id) ON DELETE SET NULL,
     INDEX idx_invoice_id (invoice_id),
-    INDEX idx_payment_date (payment_date),
+    INDEX idx_payment_date (payment_date)
 );
 
 -- =====================================================
@@ -482,7 +482,7 @@ CREATE TABLE stock_movements (
     movement_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     FOREIGN KEY (item_id) REFERENCES inventory_items(id) ON DELETE CASCADE,
-    FOREIGN KEY (moved_by) REFERENCES users(id) ON SET NULL,
+    FOREIGN KEY (moved_by) REFERENCES users(id) ON DELETE SET NULL,
     INDEX idx_item_id (item_id),
     INDEX idx_movement_type (movement_type),
     INDEX idx_movement_date (movement_date)
@@ -503,7 +503,7 @@ CREATE TABLE clinic_settings (
     updated_by INT,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     
-    FOREIGN KEY (updated_by) REFERENCES users(id) ON SET NULL,
+    FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL,
     INDEX idx_setting_name (setting_name)
 );
 
@@ -520,7 +520,7 @@ CREATE TABLE audit_log (
     user_agent TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
-    FOREIGN KEY (user_id) REFERENCES users(id) ON SET NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
     INDEX idx_user_id (user_id),
     INDEX idx_action (action),
     INDEX idx_table_name (table_name),
@@ -586,163 +586,7 @@ INSERT INTO users (email, password_hash, user_type, first_name, last_name, phone
 INSERT INTO admin_profiles (user_id, license_number, specialization, is_veterinarian) VALUES
 (1, 'VET-12345', 'General Veterinary Medicine', TRUE);
 
--- =====================================================
--- Stored Procedures for Common Operations
--- =====================================================
 
-DELIMITER //
-
--- Procedure to create a new appointment
-CREATE PROCEDURE CreateAppointment(
-    IN p_pet_id INT,
-    IN p_owner_id INT,
-    IN p_veterinarian_id INT,
-    IN p_appointment_type_id INT,
-    IN p_appointment_date DATE,
-    IN p_appointment_time TIME,
-    IN p_reason TEXT,
-    IN p_created_by INT
-)
-BEGIN
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        ROLLBACK;
-        RESIGNAL;
-    END;
-
-    START TRANSACTION;
-    
-    INSERT INTO appointments (
-        pet_id, owner_id, veterinarian_id, appointment_type_id,
-        appointment_date, appointment_time, reason_for_visit, created_by
-    ) VALUES (
-        p_pet_id, p_owner_id, p_veterinarian_id, p_appointment_type_id,
-        p_appointment_date, p_appointment_time, p_reason, p_created_by
-    );
-    
-    COMMIT;
-    
-    SELECT LAST_INSERT_ID() as appointment_id;
-END //
-
--- Procedure to generate invoice for appointment
-CREATE PROCEDURE GenerateInvoiceFromAppointment(
-    IN p_appointment_id INT,
-    IN p_created_by INT
-)
-BEGIN
-    DECLARE v_invoice_number VARCHAR(50);
-    DECLARE v_invoice_id INT;
-    DECLARE EXIT HANDLER FOR SQLEXCEPTION
-    BEGIN
-        ROLLBACK;
-        RESIGNAL;
-    END;
-
-    START TRANSACTION;
-    
-    -- Generate invoice number
-    SET v_invoice_number = CONCAT('BBC-', YEAR(CURDATE()), '-', LPAD(FLOOR(RAND() * 1000000), 6, '0'));
-    
-    -- Create invoice
-    INSERT INTO invoices (
-        invoice_number, client_id, pet_id, appointment_id, invoice_date, created_by
-    )
-    SELECT 
-        v_invoice_number,
-        a.owner_id,
-        a.pet_id,
-        a.id,
-        CURDATE(),
-        p_created_by
-    FROM appointments a
-    WHERE a.id = p_appointment_id;
-    
-    SET v_invoice_id = LAST_INSERT_ID();
-    
-    -- Add appointment type as line item
-    INSERT INTO invoice_items (invoice_id, service_id, description, quantity, unit_price, total_price)
-    SELECT 
-        v_invoice_id,
-        NULL,
-        at.type_name,
-        1,
-        at.base_price,
-        at.base_price
-    FROM appointments a
-    JOIN appointment_types at ON a.appointment_type_id = at.id
-    WHERE a.id = p_appointment_id;
-    
-    -- Update invoice totals
-    CALL UpdateInvoiceTotals(v_invoice_id);
-    
-    COMMIT;
-    
-    SELECT v_invoice_id as invoice_id, v_invoice_number as invoice_number;
-END //
-
--- Procedure to update invoice totals
-CREATE PROCEDURE UpdateInvoiceTotals(IN p_invoice_id INT)
-BEGIN
-    DECLARE v_subtotal DECIMAL(10,2);
-    DECLARE v_total DECIMAL(10,2);
-    
-    -- Calculate subtotal
-    SELECT COALESCE(SUM(total_price), 0) INTO v_subtotal
-    FROM invoice_items
-    WHERE invoice_id = p_invoice_id;
-    
-    SET v_total = v_subtotal;
-    
-    -- Update invoice
-    UPDATE invoices
-    SET 
-        subtotal = v_subtotal,
-        total_amount = v_total,
-        balance_due = v_total - amount_paid
-    WHERE id = p_invoice_id;
-END //
-
--- Function to get next available appointment slot
-CREATE FUNCTION GetNextAvailableSlot(
-    p_veterinarian_id INT,
-    p_date DATE,
-    p_duration INT
-) RETURNS TIME
-READS SQL DATA
-DETERMINISTIC
-BEGIN
-    DECLARE v_start_time TIME DEFAULT '08:00:00';
-    DECLARE v_end_time TIME DEFAULT '18:00:00';
-    DECLARE v_current_time TIME;
-    DECLARE v_conflict_count INT;
-    DECLARE v_slot_found BOOLEAN DEFAULT FALSE;
-    
-    SET v_current_time = v_start_time;
-    
-    WHILE v_current_time < v_end_time AND NOT v_slot_found DO
-        SELECT COUNT(*) INTO v_conflict_count
-        FROM appointments
-        WHERE veterinarian_id = p_veterinarian_id
-          AND appointment_date = p_date
-          AND appointment_time = v_current_time
-          AND status NOT IN ('cancelled');
-        
-        IF v_conflict_count = 0 THEN
-            SET v_slot_found = TRUE;
-        ELSE
-            SET v_current_time = ADDTIME(v_current_time, '00:30:00');
-        END IF;
-    END WHILE;
-    
-    IF v_slot_found THEN
-        RETURN v_current_time;
-    ELSE
-        RETURN NULL;
-    END IF;
-END //
-
-DELIMITER ;
 
 -- =====================================================
 -- Views for Common Queries
@@ -821,65 +665,6 @@ FROM invoices i
 LEFT JOIN users u ON i.client_id = u.id
 LEFT JOIN pets p ON i.pet_id = p.id;
 
--- =====================================================
--- Triggers for Audit Logging
--- =====================================================
-
-DELIMITER //
-
--- Trigger for appointment changes
-CREATE TRIGGER appointment_audit_trigger
-AFTER UPDATE ON appointments
-FOR EACH ROW
-BEGIN
-    INSERT INTO audit_log (user_id, action, table_name, record_id, old_values, new_values)
-    VALUES (
-        USER(),
-        'UPDATE',
-        'appointments',
-        NEW.id,
-        JSON_OBJECT(
-            'status', OLD.status,
-            'appointment_date', OLD.appointment_date,
-            'appointment_time', OLD.appointment_time,
-            'veterinarian_id', OLD.veterinarian_id
-        ),
-        JSON_OBJECT(
-            'status', NEW.status,
-            'appointment_date', NEW.appointment_date,
-            'appointment_time', NEW.appointment_time,
-            'veterinarian_id', NEW.veterinarian_id
-        )
-    );
-END //
-
--- Trigger for invoice updates
-CREATE TRIGGER invoice_audit_trigger
-AFTER UPDATE ON invoices
-FOR EACH ROW
-BEGIN
-    INSERT INTO audit_log (user_id, action, table_name, record_id, old_values, new_values)
-    VALUES (
-        USER(),
-        'UPDATE',
-        'invoices',
-        NEW.id,
-        JSON_OBJECT(
-            'status', OLD.status,
-            'total_amount', OLD.total_amount,
-            'amount_paid', OLD.amount_paid,
-            'balance_due', OLD.balance_due
-        ),
-        JSON_OBJECT(
-            'status', NEW.status,
-            'total_amount', NEW.total_amount,
-            'amount_paid', NEW.amount_paid,
-            'balance_due', NEW.balance_due
-        )
-    );
-END //
-
-DELIMITER ;
 
 -- =====================================================
 -- Indexes for Performance Optimization

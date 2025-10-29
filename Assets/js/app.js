@@ -389,7 +389,7 @@ function initializeSampleData() {
                         price: 45.0,
                     },
                 ],
-                subtotal: 165.0,
+                subtotal: 178.2,
                 total: 178.2,
                 status: "paid",
                 paymentMethod: "cash",
