@@ -771,6 +771,7 @@ function cancelAppointment(appointmentId) {
 
 // View appointment details
 function viewAppointmentDetails(appointmentId) {
+    cleanupModals();
     let appointment;
     if (AppState.userType === "admin") {
         appointment = getAllAppointments().find(

@@ -454,17 +454,19 @@ function capitalizeFirst(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-function cleanupModals() {
-    document.querySelectorAll(".modal").forEach((modal) => {
-        const bsModal = bootstrap.Modal.getInstance(modal);
-        if (bsModal) bsModal.dispose();
-        modal.remove();
+window.cleanupModals = function () {
+    document.querySelectorAll(".modal").forEach((m) => {
+        const instance = bootstrap.Modal.getInstance(m);
+        if (instance) instance.dispose();
     });
+    document.querySelectorAll(".modal").forEach((m) => m.remove());
     document.querySelectorAll(".modal-backdrop").forEach((b) => b.remove());
-    document.body.classList.remove("modal-open");
+    document.body.classList.remove("modal-open", "fade");
     document.body.style.overflow = "";
     document.body.style.paddingRight = "";
-}
+    document.documentElement.style.overflow = "";
+    document.documentElement.style.paddingRight = "";
+};
 
 // Export functions for use in other modules
 window.AppState = AppState;
