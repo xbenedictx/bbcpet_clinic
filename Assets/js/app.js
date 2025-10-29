@@ -390,7 +390,6 @@ function initializeSampleData() {
                     },
                 ],
                 subtotal: 165.0,
-                tax: 13.2,
                 total: 178.2,
                 status: "paid",
                 paymentMethod: "cash",

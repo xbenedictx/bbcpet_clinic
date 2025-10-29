@@ -357,7 +357,6 @@ CREATE TABLE services (
     category VARCHAR(100),
     description TEXT,
     base_price DECIMAL(8,2) NOT NULL DEFAULT 0.00,
-    taxable BOOLEAN DEFAULT TRUE,
     is_active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -378,8 +377,6 @@ CREATE TABLE invoices (
     invoice_date DATE NOT NULL,
     due_date DATE,
     subtotal DECIMAL(10,2) NOT NULL DEFAULT 0.00,
-    tax_rate DECIMAL(5,4) DEFAULT 0.08,
-    tax_amount DECIMAL(8,2) NOT NULL DEFAULT 0.00,
     discount_amount DECIMAL(8,2) DEFAULT 0.00,
     total_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     amount_paid DECIMAL(10,2) DEFAULT 0.00,
@@ -413,7 +410,6 @@ CREATE TABLE invoice_items (
     quantity DECIMAL(8,2) DEFAULT 1.00,
     unit_price DECIMAL(8,2) NOT NULL,
     total_price DECIMAL(10,2) NOT NULL,
-    taxable BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     
     FOREIGN KEY (invoice_id) REFERENCES invoices(id) ON DELETE CASCADE,
@@ -577,7 +573,6 @@ INSERT INTO clinic_settings (setting_name, setting_value, setting_type, descript
 ('clinic_phone', '+1-555-0123', 'text', 'Main clinic phone number', FALSE),
 ('clinic_email', 'info@bbcclinic.com', 'text', 'Main clinic email address', FALSE),
 ('appointment_duration_default', '30', 'number', 'Default appointment duration in minutes', FALSE),
-('tax_rate', '0.08', 'number', 'Default tax rate (8%)', FALSE),
 ('appointment_reminder_days', '1', 'number', 'Days before appointment to send reminder', FALSE),
 ('working_hours_start', '08:00', 'text', 'Clinic opening time', FALSE),
 ('working_hours_end', '18:00', 'text', 'Clinic closing time', FALSE),
@@ -690,8 +685,6 @@ END //
 CREATE PROCEDURE UpdateInvoiceTotals(IN p_invoice_id INT)
 BEGIN
     DECLARE v_subtotal DECIMAL(10,2);
-    DECLARE v_tax_rate DECIMAL(5,4);
-    DECLARE v_tax_amount DECIMAL(8,2);
     DECLARE v_total DECIMAL(10,2);
     
     -- Calculate subtotal
@@ -699,23 +692,12 @@ BEGIN
     FROM invoice_items
     WHERE invoice_id = p_invoice_id;
     
-    -- Get tax rate
-    SELECT CAST(setting_value AS DECIMAL(5,4)) INTO v_tax_rate
-    FROM clinic_settings
-    WHERE setting_name = 'tax_rate';
-    
-    SET v_tax_rate = COALESCE(v_tax_rate, 0.08);
-    
-    -- Calculate tax
-    SET v_tax_amount = v_subtotal * v_tax_rate;
-    SET v_total = v_subtotal + v_tax_amount;
+    SET v_total = v_subtotal;
     
     -- Update invoice
     UPDATE invoices
     SET 
         subtotal = v_subtotal,
-        tax_rate = v_tax_rate,
-        tax_amount = v_tax_amount,
         total_amount = v_total,
         balance_due = v_total - amount_paid
     WHERE id = p_invoice_id;
@@ -824,7 +806,6 @@ SELECT
     u.phone as client_phone,
     p.name as pet_name,
     i.subtotal,
-    i.tax_amount,
     i.total_amount,
     i.amount_paid,
     i.balance_due,

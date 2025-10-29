@@ -244,9 +244,6 @@ function renderInvoicesList(invoices) {
                         <p class="text-muted mb-1 small">Subtotal: ₱${invoice.subtotal.toFixed(
                             2
                         )}</p>
-                        <p class="text-muted mb-1 small">Tax: ₱${invoice.tax.toFixed(
-                            2
-                        )}</p>
                     </div>
                 </div>
                 
@@ -682,7 +679,6 @@ function handleCreateInvoice(event) {
         date: date,
         services: services,
         subtotal: subtotal,
-        tax: 0,
         total: total,
         status: "pending",
     };
