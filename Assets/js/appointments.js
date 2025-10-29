@@ -852,6 +852,7 @@ function viewAppointmentDetails(appointmentId) {
 }
 
 function editAppointment(appointmentId) {
+    cleanupModals();
     let appointment;
     if (AppState.userType === "admin") {
         appointment = getAllAppointments().find(
