@@ -134,15 +134,6 @@ function showBilling() {
     renderBillingPage();
 }
 
-function showProfile() {
-    if (!AppState.isLoggedIn) {
-        showLogin();
-        return;
-    }
-    showPage("profile-page");
-    renderProfilePage();
-}
-
 // Logout function
 function logout() {
     AppState.currentUser = null;
@@ -489,7 +480,6 @@ window.showPets = showPets;
 window.showAppointments = showAppointments;
 window.showHealthRecords = showHealthRecords;
 window.showBilling = showBilling;
-window.showProfile = showProfile;
 window.logout = logout;
 window.saveUserData = saveUserData;
 window.loadUserData = loadUserData;
