@@ -311,6 +311,36 @@ function renderInvoicesList(invoices) {
         .join("");
 }
 
+function filterInvoices() {
+    const search = document
+        .getElementById("invoice-search")
+        .value.toLowerCase();
+    const status = document.getElementById("status-filter").value;
+    const month = document.getElementById("month-filter").value;
+    let invoices = getAllInvoices();
+    if (search)
+        invoices = invoices.filter(
+            (inv) =>
+                inv.number.toLowerCase().includes(search) ||
+                inv.clientName.toLowerCase().includes(search)
+        );
+    if (status) invoices = invoices.filter((inv) => inv.status === status);
+    if (month) {
+        const [year, mon] = month.split("-");
+        invoices = invoices.filter((inv) =>
+            inv.date.startsWith(`${year}-${mon}`)
+        );
+    }
+    document.getElementById("invoices-list").innerHTML =
+        renderInvoicesList(invoices);
+}
+function clearInvoiceFilters() {
+    document.getElementById("invoice-search").value = "";
+    document.getElementById("status-filter").value = "";
+    document.getElementById("month-filter").value = "";
+    filterInvoices();
+}
+
 // Show create invoice modal (admin only)
 function showCreateInvoiceModal() {
     if (AppState.userType !== "admin") {
