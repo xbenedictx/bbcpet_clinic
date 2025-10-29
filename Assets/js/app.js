@@ -16,23 +16,20 @@ const AppState = {
 // Initialize Application
 document.addEventListener("DOMContentLoaded", function () {
     // Simulate loading
-    setTimeout(() => {
-        document.getElementById("loading-screen").style.display = "none";
-        document.getElementById("main-app").style.display = "block";
+    document.getElementById("main-app").style.display = "block";
 
-        // Check if user is already logged in (simulate with localStorage)
-        checkAuthStatus();
+    // Check if user is already logged in (simulate with localStorage)
+    checkAuthStatus();
 
-        // Initialize sample data
-        initializeSampleData();
+    // Initialize sample data
+    initializeSampleData();
 
-        // Show appropriate page
-        if (AppState.isLoggedIn) {
-            showDashboard();
-        } else {
-            showLogin();
-        }
-    }, 2000);
+    // Show appropriate page
+    if (AppState.isLoggedIn) {
+        showDashboard();
+    } else {
+        showLogin();
+    }
 });
 
 // Check authentication status
