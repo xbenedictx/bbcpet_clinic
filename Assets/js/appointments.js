@@ -371,7 +371,7 @@ function renderAppointmentsList(appointments) {
                         `
                                 : ""
                         }
-                        
+    
                         ${
                             appointment.notes
                                 ? `
@@ -382,45 +382,75 @@ function renderAppointmentsList(appointments) {
                         `
                                 : ""
                         }
+    
+                        <!-- ser edit/cancel actions -->
+                        <div class="appointment-actions mt-3">
+                            ${
+                                AppState.userType === "admin" ||
+                                appointment.status === "pending" ||
+                                appointment.status === "confirmed"
+                                    ? `
+                                <button class="btn btn-sm btn-outline-primary me-2" onclick="event.stopPropagation(); editAppointment('${appointment.id}')">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="event.stopPropagation(); cancelAppointment('${appointment.id}')">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                            `
+                                    : ""
+                            }
+                        </div>
                     </div>
                     
-                    <div class="dropdown" onclick="event.stopPropagation();"> <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
+                    <!-- existing dropdown menu (still works for admins) -->
+                    <div class="dropdown" onclick="event.stopPropagation();">
+                        <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="dropdown">
                             <i class="fas fa-ellipsis-v"></i>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="#" onclick="viewAppointmentDetails('${
-                                appointment.id
-                            }')">
-                                <i class="fas fa-eye me-2"></i>View Details
-                            </a></li>
+                            <li>
+                                <a class="dropdown-item" href="#" onclick="viewAppointmentDetails('${
+                                    appointment.id
+                                }')">
+                                    <i class="fas fa-eye me-2"></i>View Details
+                                </a>
+                            </li>
                             ${
                                 appointment.status === "pending" ||
                                 appointment.status === "confirmed"
                                     ? `
-                                <li><a class="dropdown-item" href="#" onclick="editAppointment('${appointment.id}')">
-                                    <i class="fas fa-edit me-2"></i>Edit
-                                </a></li>
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="editAppointment('${appointment.id}')">
+                                        <i class="fas fa-edit me-2"></i>Edit
+                                    </a>
+                                </li>
                             `
                                     : ""
                             }
                             ${
                                 AppState.userType === "admin"
                                     ? `
-                                <li><a class="dropdown-item" href="#" onclick="updateAppointmentStatus('${appointment.id}', 'confirmed')">
-                                    <i class="fas fa-check me-2"></i>Confirm
-                                </a></li>
-                                <li><a class="dropdown-item" href="#" onclick="updateAppointmentStatus('${appointment.id}', 'completed')">
-                                    <i class="fas fa-check-double me-2"></i>Mark Complete
-                                </a></li>
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="updateAppointmentStatus('${appointment.id}', 'confirmed')">
+                                        <i class="fas fa-check me-2"></i>Confirm
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item" href="#" onclick="updateAppointmentStatus('${appointment.id}', 'completed')">
+                                        <i class="fas fa-check-double me-2"></i>Mark Complete
+                                    </a>
+                                </li>
                             `
                                     : ""
                             }
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="#" onclick="cancelAppointment('${
-                                appointment.id
-                            }')">
-                                <i class="fas fa-times me-2"></i>Cancel
-                            </a></li>
+                            <li>
+                                <a class="dropdown-item text-danger" href="#" onclick="cancelAppointment('${
+                                    appointment.id
+                                }')">
+                                    <i class="fas fa-times me-2"></i>Cancel
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>
@@ -828,16 +858,21 @@ function viewAppointmentDetails(appointmentId) {
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary" onclick="editAppointment('${
-                            appointment.id
-                        }')">
-                            <i class="fas fa-edit me-2"></i>Edit
-                        </button>
-                        <button type="button" class="btn btn-danger" onclick="cancelAppointment('${
-                            appointment.id
-                        }')">
-                            <i class="fas fa-times me-2"></i>Cancel
-                        </button>
+                        ${
+                            (AppState.userType === "user" &&
+                                (appointment.status === "pending" ||
+                                    appointment.status === "confirmed")) ||
+                            AppState.userType === "admin"
+                                ? `
+                                <button type="button" class="btn btn-primary" onclick="editAppointment('${appointment.id}')">
+                                    <i class="fas fa-edit me-2"></i>Edit
+                                </button>
+                                <button type="button" class="btn btn-danger" onclick="cancelAppointment('${appointment.id}')">
+                                    <i class="fas fa-times me-2"></i>Cancel
+                                </button>
+                                `
+                                : ""
+                        }
                     </div>
                 </div>
             </div>
@@ -1043,9 +1078,6 @@ function handleEditAppointment(appointmentId) {
     showAlert("Appointment updated successfully!", "success");
 }
 
-// Export the function
-window.handleEditAppointment = handleEditAppointment;
-
 // Show new appointment modal (admin)
 function showNewAppointmentModal() {
     const clients = getAllClients();
@@ -1241,9 +1273,10 @@ window.renderAppointmentsPage = renderAppointmentsPage;
 window.showBookAppointmentModal = showBookAppointmentModal;
 window.handleBookAppointment = handleBookAppointment;
 window.updateAppointmentStatus = updateAppointmentStatus;
+window.handleEditAppointment = handleEditAppointment;
+window.editAppointment = editAppointment;
 window.cancelAppointment = cancelAppointment;
 window.viewAppointmentDetails = viewAppointmentDetails;
-window.editAppointment = editAppointment;
 window.showNewAppointmentModal = showNewAppointmentModal;
 window.changeMonth = changeMonth;
 window.showDayAppointments = showDayAppointments;

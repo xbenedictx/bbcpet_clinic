@@ -308,6 +308,95 @@ function renderInvoicesList(invoices) {
         .join("");
 }
 
+function viewInvoiceDetails(invoiceId) {
+    let invoice;
+    if (AppState.userType === "admin") {
+        invoice = getAllInvoices().find((inv) => inv.id === invoiceId);
+    } else {
+        invoice = AppState.invoices.find((inv) => inv.id === invoiceId);
+    }
+    if (!invoice) return showAlert("Invoice not found", "danger");
+
+    const modalHtml = `
+        <div class="modal fade" id="invoiceDetailsModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Invoice Details: ${
+                            invoice.number
+                        }</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="invoice-header mb-4">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Client: ${invoice.clientName}</h6>
+                                    <p class="text-muted">Pet: ${
+                                        invoice.petName
+                                    }</p>
+                                </div>
+                                <div class="col-md-6 text-md-end">
+                                    <h6>Date: ${formatDate(invoice.date)}</h6>
+                                    <p class="text-muted">Status: <span class="status-badge status-${
+                                        invoice.status
+                                    }">${capitalizeFirst(
+        invoice.status
+    )}</span></p>
+                                </div>
+                            </div>
+                        </div>
+                        <table class="invoice-table">
+                            <thead>
+                                <tr><th>Description</th><th>Qty</th><th>Price</th><th>Total</th></tr>
+                            </thead>
+                            <tbody>
+                                ${invoice.services
+                                    .map(
+                                        (service) => `
+                                    <tr>
+                                        <td>${service.description}</td>
+                                        <td>${service.quantity}</td>
+                                        <td>₱${service.price.toFixed(2)}</td>
+                                        <td>₱${(
+                                            service.quantity * service.price
+                                        ).toFixed(2)}</td>
+                                    </tr>
+                                `
+                                    )
+                                    .join("")}
+                            </tbody>
+                        </table>
+                        <div class="invoice-total text-end">
+                            <h5>Subtotal: ₱${invoice.subtotal.toFixed(2)}</h5>
+                            <h4>Total: ₱${invoice.total.toFixed(2)}</h4>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        ${
+                            AppState.userType === "admin" &&
+                            invoice.status !== "paid"
+                                ? `
+                            <button type="button" class="btn btn-primary" onclick="markInvoicePaid('${invoice.id}')">
+                                Mark as Paid
+                            </button>
+                        `
+                                : ""
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById("modal-container").innerHTML += modalHtml;
+    const modal = new bootstrap.Modal(
+        document.getElementById("invoiceDetailsModal")
+    );
+    modal.show();
+}
+
 function filterInvoices() {
     const search = document
         .getElementById("invoice-search")
@@ -774,3 +863,4 @@ function markInvoicePaid(invoiceId) {
 }
 
 window.markInvoicePaid = markInvoicePaid;
+window.viewInvoiceDetails = viewInvoiceDetails;

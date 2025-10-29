@@ -205,7 +205,7 @@ function renderUserDashboard(container) {
                             <div class="col-md-3 mb-2">
                                 <button class="btn btn-primary w-100" onclick="showBookAppointment()">
                                     <i class="fas fa-calendar-plus me-2"></i>
-                                    Book Appointment
+                                    My Appointments
                                 </button>
                             </div>
                             <div class="col-md-3 mb-2">
@@ -326,7 +326,7 @@ function loadUserDashboardData() {
     // Upcoming appointments
     const today = new Date().toISOString().split("T")[0];
     const upcomingAppointments = AppState.appointments.filter(
-        (apt) => apt.date >= today
+        (apt) => apt.date >= today && apt.status !== "cancelled"
     );
     document.getElementById("user-upcoming-appointments").textContent =
         upcomingAppointments.length;
